@@ -1,0 +1,15 @@
+.custom-card {
+  width: 350px;
+}
+
+@media (max-width: 1350px) {
+  .custom-card {
+    width: 35vw;
+  }
+}
+
+@media (max-width: 1260px) {
+  .custom-card {
+    width: 70vw;
+  }
+}
