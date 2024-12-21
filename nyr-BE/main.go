@@ -24,7 +24,7 @@ func main() {
 	//getting PORT from env file
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "9090"
+		port = "8080"
 	}
 
 	if err := r.Run(":" + port); err != nil {
