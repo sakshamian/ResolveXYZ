@@ -5,32 +5,42 @@ import (
 	"fmt"
 	"os"
 
-	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-var DB *mongo.Database
+var (
+	DB     *mongo.Database
+	client *mongo.Client
+)
 
+// connects to database
 func Connect() {
-
 	serverAPI := options.ServerAPI(options.ServerAPIVersion1)
 	opts := options.Client().ApplyURI(os.Getenv("MONGO_URI")).SetServerAPIOptions(serverAPI)
-	
-	// Create a new client and connect to the server
+
 	client, err := mongo.Connect(context.TODO(), opts)
 	if err != nil {
 		panic(err)
 	}
-	defer func() {
-		if err = client.Disconnect(context.TODO()); err != nil {
-		panic(err)
-		}
-	}()
 
-	// Send a ping to confirm a successful connection
-	if err := client.Database("admin").RunCommand(context.TODO(), bson.D{{"ping", 1}}).Err(); err != nil {
-		panic(err)
+	DB = client.Database(os.Getenv("MONGO_DATABASE"))
+	fmt.Println("Successfully connected to MongoDB!")
+}
+
+// Disconnects
+func Disconnect() {
+	if client != nil {
+		err := client.Disconnect(context.TODO())
+		if err != nil {
+			fmt.Printf("Failed to disconnect MongoDB: %v\n", err)
+		} else {
+			fmt.Println("Disconnected from MongoDB!")
+		}
 	}
-	fmt.Println("Pinged your deployment. You successfully connected to MongoDB!")
+}
+
+// Returns a collection object
+func GetCollection(collectionName string) *mongo.Collection {
+	return DB.Collection(collectionName)
 }

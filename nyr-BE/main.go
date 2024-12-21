@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"nyr/config"
 	"nyr/db"
 	"nyr/routes"
 	"os"
@@ -17,7 +18,9 @@ func main() {
 	if err != nil {
 		fmt.Println("Error loading .env file", err)
 	}
-	
+
+	config.InitializeOAuthConfig()
+
 	db.Connect()
 
 	router := gin.Default()

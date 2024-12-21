@@ -11,4 +11,6 @@ func InitRoutes(router *gin.Engine) {
 	router.GET("/health", controllers.HealthCheck)
 
 	// auth routes
+	router.GET("/auth/google", controllers.GoogleLogin)
+	router.GET("/auth/google/callback", controllers.GoogleCallback)
 }
