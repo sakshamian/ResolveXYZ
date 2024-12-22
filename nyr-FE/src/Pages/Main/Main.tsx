@@ -1,27 +1,34 @@
 import React, { useState, useEffect } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
-import { Box, Typography, CircularProgress } from "@mui/material";
-import { fetchCards, CardData } from "../../services/api";
+import { Box, Typography } from "@mui/material";
+import { fetchResolutions, ResolutionData } from "../../services/api";
 import ResolutionCard from "../../Components/Card/ResolutionCard";
 import "./Main.css";
-import ResolutionsSpinner from "../../Components/Loader/Loader";
-import QuoteCarousel from "../../Components/Loader/Loader";
 import HourglassLoader from "../../Components/Loader/Loader";
 
+interface Resolution {
+    _id: string;
+    resolution: string;
+    comment_count: number;
+    like_count: number;
+    created_at: string;
+    updated_at: string;
+}
+
+interface InfiniteScrollProps {
+    limit: number;
+}
+
 const Main = () => {
-    const [cards, setCards] = useState<CardData[]>([]);
+    const [cards, setCards] = useState<Resolution[]>([]);
     const [hasMore, setHasMore] = useState(true);
     const [page, setPage] = useState(1);
 
     const loadCards = async () => {
         try {
-            const data = await fetchCards(page);
-            if (data.length === 0) {
-                setHasMore(false); // No more data to load
-            } else {
-                setCards((prevCards) => [...prevCards, ...data]);
-                setPage((prevPage) => prevPage + 1);
-            }
+            const data = await fetchResolutions(page);
+            setCards((prevResolutions) => [...prevResolutions, ...data.resolutions]);
+            setHasMore(data.has_more);
         } catch (error) {
             console.error("Failed to load cards:", error);
         }
@@ -30,11 +37,6 @@ const Main = () => {
     useEffect(() => {
         loadCards();
     }, []);
-
-    // const cards = Array.from({ length: 15 }, (_, index) => ({
-    //     title: `Great App Idea ${index + 1}`,
-    //     description: 'This is a revolutionary app idea that will change the way we interact with technology.',
-    // }));
 
     return (
         <div className="card-container">
@@ -57,8 +59,11 @@ const Main = () => {
                     {cards.map((card, ind) => (
                         <div key={ind} className="card-item">
                             <ResolutionCard
-                                ideaTitle={card.title}
-                                ideaDescription={card.content}
+                                ideaTitle={"xyz"}
+                                ideaDescription={card.resolution}
+                                likeCount={card.like_count}
+                                commentCount={card.comment_count}
+                                createdAt={card.created_at}
                             />
                         </div>
                     ))}

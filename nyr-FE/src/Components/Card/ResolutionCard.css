@@ -1,5 +1,6 @@
 .custom-card {
   width: 350px;
+  font-family: 'Comic Neue', sans-serif;
 }
 
 @media (max-width: 1350px) {

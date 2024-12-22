@@ -39,7 +39,7 @@ const SignUp: React.FC = () => {
                         text="signup_with"
                         useOneTap
                     />
-                    <p onClick={toggleAuthMethod} style={{ cursor: 'pointer' }}>
+                    <p onClick={toggleAuthMethod} style={{ cursor: 'pointer', textDecoration: 'underline', fontSize: '14px', marginTop: '15px' }}>
                         Already have an account? Sign In
                     </p>
                 </div>

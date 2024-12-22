@@ -5,6 +5,7 @@ import CommentIcon from '@mui/icons-material/Comment';
 import "./ResolutionCard.css";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import CloseIcon from "@mui/icons-material/Close";
+import { convertTimeToDaysAgo } from '../../utils/utils';
 
 interface Comment {
     id: number;
@@ -16,12 +17,13 @@ interface Comment {
 interface CartProps {
     ideaTitle: string;
     ideaDescription: string;
+    likeCount: number;
+    commentCount: number;
+    createdAt: string;
 }
 
-const ResolutionCard: React.FC<CartProps> = ({ ideaTitle, ideaDescription }) => {
+const ResolutionCard: React.FC<CartProps> = ({ ideaTitle, ideaDescription, likeCount, commentCount, createdAt }) => {
     const [liked, setLiked] = useState<boolean>(false);
-    const [likeCount, setLikeCount] = useState<number>(0); // State to track the number of likes
-    const [commentCount, setCommentCount] = useState<number>(0); // State to track the number of comments
     const [comment, setComment] = useState<string>(''); // Track the inputted comment
     // const [comments, setComments] = useState<string[]>([]); // Array to store the list of comments
     const [isCommentDrawerOpen, setIsCommentDrawerOpen] = React.useState(false);
@@ -47,11 +49,11 @@ const ResolutionCard: React.FC<CartProps> = ({ ideaTitle, ideaDescription }) => 
 
     // Handle Like Button
     const handleLike = () => {
-        if (liked) {
-            setLikeCount(likeCount - 1); // Decrease like count when unliking
-        } else {
-            setLikeCount(likeCount + 1); // Increase like count when liking
-        }
+        // if (liked) {
+        //     setLikeCount(likeCount - 1); // Decrease like count when unliking
+        // } else {
+        //     setLikeCount(likeCount + 1); // Increase like count when liking
+        // }
         setLiked(!liked); // Toggle like status
     };
 
@@ -66,7 +68,7 @@ const ResolutionCard: React.FC<CartProps> = ({ ideaTitle, ideaDescription }) => 
             };
 
             setComments([...comments, newCommentObj]); // Add new comment to the list
-            setCommentCount(commentCount + 1); // Increment comment count
+            // setCommentCount(commentCount + 1); // Increment comment count
             setComment(''); // Clear the comment input field after submitting
         }
     };
@@ -86,12 +88,12 @@ const ResolutionCard: React.FC<CartProps> = ({ ideaTitle, ideaDescription }) => 
                 marginBottom: '20px', // Space between cards
             }}>
             <CardContent sx={{ flexGrow: 1 }}>
-                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                <h3>
                     {ideaTitle}
-                </Typography>
-                <Typography variant="body2" sx={{ marginTop: 1 }}>
+                </h3>
+                <Box sx={{ marginTop: 1 }}>
                     {ideaDescription}
-                </Typography>
+                </Box>
             </CardContent>
             <CardActions sx={{
                 display: 'flex',
@@ -102,20 +104,23 @@ const ResolutionCard: React.FC<CartProps> = ({ ideaTitle, ideaDescription }) => 
                     <IconButton onClick={handleLike} sx={{ color: liked ? 'primary.main' : '#fff' }}>
                         <ThumbUpIcon />
                     </IconButton>
-                    <Typography variant="body2" sx={{ marginLeft: 1 }}>
+                    <p>
                         {likeCount}
-                    </Typography>
+                    </p>
                 </Box>
 
                 <Box sx={{ display: 'flex', alignItems: 'center' }} onClick={toggleDrawer(true)}>
                     <IconButton onClick={handleCommentSubmit} sx={{ color: '#fff' }}>
                         <CommentIcon />
                     </IconButton>
-                    <Typography variant="body2" sx={{ marginLeft: 1 }}>
+                    <p>
                         {commentCount}
-                    </Typography>
+                    </p>
                 </Box>
             </CardActions>
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                {convertTimeToDaysAgo(createdAt)}
+            </Box>
             <Drawer
                 anchor="left"
                 open={isCommentDrawerOpen}

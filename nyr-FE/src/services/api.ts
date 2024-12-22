@@ -1,6 +1,6 @@
 const API_BASE_URL = "http://localhost:8080";
 
-export interface CardData {
+export interface ResolutionData {
     id: number;
     title: string;
     content: string;
@@ -25,12 +25,26 @@ export const verifyToken = async (token: string): Promise<any> => {
     if (!response.ok) throw new Error("Invalid token");
     return response.json();
 };
+// export const getResolutions = async (page: number, limit: number) => {
+//     try {
+//         const response = await axios.get(API_URL, {
+//             params: {
+//                 page: page,
+//                 limit: limit,
+//             },
+//         });
+//         return response.data;
+//     } catch (error) {
+//         console.error('Error fetching resolutions:', error);
+//         throw error;
+//     }
+// };
 
-export const fetchCards = async (page: number, limit: number = 10): Promise<CardData[]> => {
+export const fetchResolutions = async (page: number, limit: number = 10) => {
     try {
-        const response = await fetch(`${API_BASE_URL}/cards?page=${page}&limit=${limit}`);
+        const response = await fetch(`${API_BASE_URL}/resolution?page=${page}&limit=${limit}`);
         if (!response.ok) {
-            throw new Error("Failed to fetch cards");
+            throw new Error("Failed to fetch resolutions");
         }
         return await response.json();
     } catch (error) {
