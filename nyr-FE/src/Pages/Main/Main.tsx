@@ -1,3 +1,4 @@
+import { Grid2 } from "@mui/material";
 import ResolutionCard from "../../Components/Card/ResolutionCard";
 import "./Main.css";
 
