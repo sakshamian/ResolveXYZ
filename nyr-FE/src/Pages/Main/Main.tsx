@@ -13,6 +13,9 @@ interface Resolution {
     like_count: number;
     created_at: string;
     updated_at: string;
+    tags: string[];
+    user_name: string;
+    user_id: string;
 }
 
 interface InfiniteScrollProps {
@@ -25,6 +28,7 @@ const Main = () => {
     const [page, setPage] = useState(1);
 
     const loadCards = async () => {
+
         try {
             const data = await fetchResolutions(page);
             setCards((prevResolutions) => [...prevResolutions, ...data.resolutions]);
@@ -55,19 +59,35 @@ const Main = () => {
                     </Typography>
                 }
             >
-                <Box display="flex" flexDirection="column" gap={2} p={2}>
-                    {cards.map((card, ind) => (
-                        <div key={ind} className="card-item">
-                            <ResolutionCard
-                                ideaTitle={"xyz"}
-                                ideaDescription={card.resolution}
-                                likeCount={card.like_count}
-                                commentCount={card.comment_count}
-                                createdAt={card.created_at}
-                            />
-                        </div>
-                    ))}
-                </Box>
+                 <Box
+            display="flex"
+            flexWrap="wrap"
+            gap={2}
+            p={2}
+            justifyContent="space-between"
+        >
+            {cards.map((card, ind) => {
+                console.log(card);
+                return (
+                    <Box
+                        key={ind}
+                        flex="1 1 calc(33.333% - 16px)" // This ensures three cards per row with space between them
+                        minWidth="300px" // Minimum width to avoid items being too small
+                    >
+                        <ResolutionCard
+                            ideaTitle={card.user_name || "Unknown User"}
+                            ideaDescription={card.resolution || "No resolution provided"}
+                            likeCount={card.like_count}
+                            commentCount={card.comment_count}
+                            createdAt={card.created_at}
+                            tags={card.tags}
+                            r_id={card._id}
+                            user_id={card.user_id}
+                        />
+                    </Box>
+                );
+            })}
+        </Box>
             </InfiniteScroll>
         </div>
     );

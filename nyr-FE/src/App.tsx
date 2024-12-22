@@ -4,7 +4,7 @@ import ResponsiveAppBar from './Components/Navbar/ResponsiveAppBar'
 import { AuthProvider } from './Context/AuthContext'
 import Main from './Pages/Main/Main'
 import ProtectedRoute from './Components/ProtectedRoute/ProtectedRoute'
-import SignIn from './Pages/Auth/Signin'
+import SignIn from './Pages/Auth/SignIn'
 import SignUp from './Pages/Auth/SignUp'
 
 function App() {

@@ -29,7 +29,7 @@ func GetResolutions(c *gin.Context) {
 	// Get the resolutions collection
 	resolutionsCollection := db.GetCollection("resolutions")
 
-	// Aggregate pipeline to get resolutions with like count, comment count, user name, and tags
+	// Aggregate pipeline to get resolutions with like count, comment count, user name, user_id, and tags
 	aggPipeline := []bson.M{
 		// Step 1: Look up the "likes" collection to get the like count for each resolution
 		{
@@ -49,7 +49,7 @@ func GetResolutions(c *gin.Context) {
 				"as":           "comments", // Store the matched comments in a field named "comments"
 			},
 		},
-		// Step 3: Look up the "users" collection to get the user's name for each resolution
+		// Step 3: Look up the "users" collection to get the user's name and user_id for each resolution
 		{
 			"$lookup": bson.M{
 				"from":         "users",   // Join with the "users" collection
@@ -58,7 +58,7 @@ func GetResolutions(c *gin.Context) {
 				"as":           "user",    // Store the matched user in a field named "user"
 			},
 		},
-		// Step 4: Add fields for like count, comment count, user name, and tags
+		// Step 4: Add fields for like count, comment count, user name, user_id, and tags
 		{
 			"$addFields": bson.M{
 				"like_count": bson.M{
@@ -70,18 +70,22 @@ func GetResolutions(c *gin.Context) {
 				"user_name": bson.M{
 					"$arrayElemAt": []interface{}{"$user.name", 0}, // Get the first matched user name
 				},
+				"user_id": bson.M{
+					"$arrayElemAt": []interface{}{"$user._id", 0}, // Get the first matched user ID
+				},
 				"tags": bson.M{
 					"$ifNull": []interface{}{"$tags", []interface{}{}},
 				}, // Include the tags array from the resolutions collection
 			},
 		},
-		// Step 5: Project the required fields including resolution, like count, comment count, user name, tags, and timestamps
+		// Step 5: Project the required fields including resolution, like count, comment count, user name, tags, user_id, and timestamps
 		{
 			"$project": bson.M{
 				"resolution":    1, // Include the resolution field (or other fields as needed)
 				"like_count":    1, // Include like count
 				"comment_count": 1, // Include comment count
 				"user_name":     1, // Include user name
+				"user_id":       1, // Include user ID
 				"tags":          1, // Include tags array
 				"created_at":    1, // Include created_at field
 				"updated_at":    1, // Include updated_at field
