@@ -6,9 +6,39 @@ import './Auth.css';
 const SignIn: React.FC = () => {
     const navigate = useNavigate();
 
-    const handleLoginSuccess = (response: any) => {
-        console.log('Login Success:', response);
-        // Send the response credential (token) to your backend for further processing
+    const handleLoginSuccess = async (response: any) => {
+        console.log("Google Login Success:", response);
+
+        if (response.credential) {
+            try {
+                const res = await fetch('http://localhost:8080/auth/google/callback', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        token: response.credential, // Send the ID token
+                    }),
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    console.log('Login successful:', data);
+
+                    // Store token from your backend
+                    localStorage.setItem('token', data.token);
+
+                    // Redirect to dashboard
+                    // navigate('/');
+                } else {
+                    console.error('Authentication failed:', res.statusText);
+                }
+            } catch (error) {
+                console.error('Error during login:', error);
+            }
+        } else {
+            console.error('No credential received from Google');
+        }
     };
 
     const handleLoginFailure = (error: any) => {
@@ -30,7 +60,7 @@ const SignIn: React.FC = () => {
     }, [navigate]);
 
     return (
-        <GoogleOAuthProvider clientId="1084055477464-qject72ddsd71e4i65si1pq0okmt36dm.apps.googleusercontent.com">
+        <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_OAUTH_CLIENT_ID}>
             <div className="auth-container">
                 <div className="auth-form">
                     {/* <h2>Sign In</h2> */}
@@ -38,7 +68,7 @@ const SignIn: React.FC = () => {
                         onSuccess={handleLoginSuccess}
                         onError={handleLoginFailure}
                         text="signin_with"
-                        useOneTap
+                    // useOneTap
                     />
                     <p onClick={toggleAuthMethod} style={{ cursor: 'pointer', textDecoration: 'underline', fontSize: '14px', marginTop: '15px' }}>
                         Don't have an account? Sign Up
@@ -50,3 +80,5 @@ const SignIn: React.FC = () => {
 };
 
 export default SignIn;
+
+// src/components/Login.tsx

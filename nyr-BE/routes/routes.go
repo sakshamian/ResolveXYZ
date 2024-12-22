@@ -16,7 +16,8 @@ func InitRoutes(router *gin.Engine) {
 
 	// auth routes
 	router.GET("/auth/google", controllers.GoogleLogin)
-	router.GET("/auth/google/callback", controllers.GoogleCallback)
+	// router.GET("/auth/google/callback", controllers.GoogleCallback)
+	router.POST("/auth/google/callback", controllers.GoogleLoginLatest)
 
 	// resolution routes
 	resolutionRoutes := router.Group("resolution")

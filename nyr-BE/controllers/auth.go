@@ -3,6 +3,7 @@ package controllers
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"nyr/config"
 	"nyr/db"
@@ -88,4 +89,70 @@ func GoogleCallback(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"token": tokenString, "user": existingUser})
+}
+
+func GoogleLoginLatest(c *gin.Context) {
+	var requestBody struct {
+		Token string `json:"token"`
+	}
+
+	if err := c.ShouldBindJSON(&requestBody); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+		return
+	}
+
+	// Validate the token with Google's API
+	tokenInfoURL := fmt.Sprintf("https://oauth2.googleapis.com/tokeninfo?id_token=%s", requestBody.Token)
+
+	fmt.Println("asds")
+	resp, err := http.Get(tokenInfoURL)
+	if err != nil || resp.StatusCode != http.StatusOK {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid Google token"})
+		return
+	}
+	defer resp.Body.Close()
+
+	var userInfo map[string]interface{}
+	if err := json.NewDecoder(resp.Body).Decode(&userInfo); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to decode user info"})
+		return
+	}
+
+	// Process user info (e.g., save to database)
+	email := userInfo["email"].(string)
+	username := userInfo["name"].(string)
+	image := userInfo["picture"].(string)
+
+	collection := db.GetCollection("users")
+	var existingUser models.User
+	err = collection.FindOne(context.Background(), bson.M{"email": email}).Decode(&existingUser)
+	if err != nil {
+		// Create a new user if not found
+		newUser := models.User{
+			ID:        primitive.NewObjectID(),
+			Name:      username,
+			Email:     email,
+			Image:     image,
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+		}
+		_, err := collection.InsertOne(context.Background(), newUser)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user"})
+			return
+		}
+		existingUser = newUser
+	}
+
+	// Generate JWT token
+	tokenString, err := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"user_id": existingUser.ID.Hex(),
+		"exp":     time.Now().Add(24 * time.Hour).Unix(),
+	}).SignedString(jwtSecretKey)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate token"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Login successful", "token": tokenString, "user": existingUser})
 }
