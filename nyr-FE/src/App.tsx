@@ -1,12 +1,12 @@
 import './App.css'
-import Card from './Components/Card'
-import ResponsiveAppBar from './Components/ResponsiveAppBar'
+import ResponsiveAppBar from './Components/Navbar/ResponsiveAppBar'
+import Main from './Pages/Main/Main'
 
 function App() {
   return (
     <>
       <ResponsiveAppBar />
-      <Card />
+      <Main />
     </>
   )
 }

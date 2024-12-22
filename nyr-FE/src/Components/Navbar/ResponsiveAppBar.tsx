@@ -6,7 +6,7 @@ import Container from '@mui/material/Container';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import { Button } from '@mui/material';
+import { Box, Button } from '@mui/material';
 
 function ResponsiveAppBar() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -17,11 +17,15 @@ function ResponsiveAppBar() {
   const handleClose = () => {
     setAnchorEl(null);
   };
+
   return (
     <AppBar position="static" sx={{ backgroundColor: '#181c23' }}>
       <Container maxWidth="xl">
         <Toolbar disableGutters sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-          <AdbIcon sx={{ display: 'flex', mr: 1, color: "yellow" }} />
+          {/* <AdbIcon sx={{ display: 'flex', mr: 1, color: "yellow" }} /> */}
+          <Box>
+            Resolution Hub
+          </Box>
           <div>
             <Button
               id="basic-button"
@@ -42,14 +46,15 @@ function ResponsiveAppBar() {
               }}
               sx={{
                 '& .MuiPaper-root': {
-                  backgroundColor: '#181c23',
+                  backgroundColor: '#242936',
                   color: '#fff',
+                  minWidth: 200
                 }
               }}
             >
-              <MenuItem onClick={handleClose}>Sign in</MenuItem>
-              <MenuItem onClick={handleClose}>Sign out</MenuItem>
-              <MenuItem onClick={handleClose}>My ideas</MenuItem>
+              <MenuItem sx={{ fontSize: 14 }} onClick={handleClose}>Sign in</MenuItem>
+              <MenuItem sx={{ fontSize: 14 }} onClick={handleClose}>Sign out</MenuItem>
+              <MenuItem sx={{ fontSize: 14 }} onClick={handleClose}>My ideas</MenuItem>
             </Menu>
           </div>
         </Toolbar>
