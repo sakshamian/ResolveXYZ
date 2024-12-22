@@ -25,20 +25,6 @@ export const verifyToken = async (token: string): Promise<any> => {
     if (!response.ok) throw new Error("Invalid token");
     return response.json();
 };
-// export const getResolutions = async (page: number, limit: number) => {
-//     try {
-//         const response = await axios.get(API_URL, {
-//             params: {
-//                 page: page,
-//                 limit: limit,
-//             },
-//         });
-//         return response.data;
-//     } catch (error) {
-//         console.error('Error fetching resolutions:', error);
-//         throw error;
-//     }
-// };
 
 export const fetchResolutions = async (page: number, limit: number = 10) => {
     try {

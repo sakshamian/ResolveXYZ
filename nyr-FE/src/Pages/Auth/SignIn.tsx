@@ -2,16 +2,16 @@ import React, { useEffect } from 'react';
 import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
 import { useNavigate } from 'react-router-dom';
 import './Auth.css';
+import { useAuth } from '../../Context/AuthContext';
 
 const SignIn: React.FC = () => {
+    const { setToken } = useAuth();
     const navigate = useNavigate();
 
     const handleLoginSuccess = async (response: any) => {
-        console.log("Google Login Success:", response);
-
         if (response.credential) {
             try {
-                const res = await fetch('http://localhost:8080/auth/google/callback', {
+                const res = await fetch(import.meta.env.VITE_GOOGLE_OAUTH_REDIRECT, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -23,13 +23,9 @@ const SignIn: React.FC = () => {
 
                 if (res.ok) {
                     const data = await res.json();
-                    console.log('Login successful:', data);
-
-                    // Store token from your backend
                     localStorage.setItem('token', data.token);
-
-                    // Redirect to dashboard
-                    // navigate('/');
+                    setToken(data.token);
+                    navigate('/');
                 } else {
                     console.error('Authentication failed:', res.statusText);
                 }
