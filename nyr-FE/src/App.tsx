@@ -1,9 +1,11 @@
-import { BrowserRouter, Route, Router, Routes } from 'react-router'
+import { BrowserRouter, Route, Routes } from 'react-router'
 import './App.css'
 import ResponsiveAppBar from './Components/Navbar/ResponsiveAppBar'
 import { AuthProvider } from './Context/AuthContext'
 import Main from './Pages/Main/Main'
 import ProtectedRoute from './Components/ProtectedRoute/ProtectedRoute'
+import SignIn from './Pages/Auth/Signin'
+import SignUp from './Pages/Auth/SignUp'
 
 function App() {
   return (
@@ -24,6 +26,18 @@ function App() {
               <ProtectedRoute>
                 <Main />
               </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/sign-up"
+            element={
+              <SignUp />
+            }
+          />
+          <Route
+            path="/sign-in"
+            element={
+              <SignIn />
             }
           />
         </Routes>

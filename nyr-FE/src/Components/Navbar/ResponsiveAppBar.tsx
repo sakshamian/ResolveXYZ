@@ -7,8 +7,12 @@ import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { Box, Button } from '@mui/material';
+import { useAuth } from '../../Context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 function ResponsiveAppBar() {
+  const navigate = useNavigate();
+  const { user, token, signOut } = useAuth();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -17,6 +21,22 @@ function ResponsiveAppBar() {
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+  const handleSignIn = () => {
+    navigate('/sign-in');
+  };
+
+  const handleSignOut = () => {
+    signOut();
+    navigate('/');
+  };
+
+  const handleSignUp = () => {
+    navigate('/sign-up');
+  };
+
+  // Check if user is logged in
+  const isLoggedIn = user !== null && token !== null;
 
   return (
     <AppBar position="static" sx={{ backgroundColor: '#181c23' }}>
@@ -52,9 +72,17 @@ function ResponsiveAppBar() {
                 }
               }}
             >
-              <MenuItem sx={{ fontSize: 14 }} onClick={handleClose}>Sign in</MenuItem>
-              <MenuItem sx={{ fontSize: 14 }} onClick={handleClose}>Sign out</MenuItem>
-              <MenuItem sx={{ fontSize: 14 }} onClick={handleClose}>My ideas</MenuItem>
+              {
+                isLoggedIn ?
+                  <>
+                    <MenuItem sx={{ fontSize: 14 }} onClick={handleClose}>My resolutions</MenuItem>
+                    <MenuItem sx={{ fontSize: 14 }} onClick={handleSignOut}>Sign out</MenuItem>
+                  </> :
+                  <>
+                    <MenuItem sx={{ fontSize: 14 }} onClick={handleSignIn}>Sign in</MenuItem>
+                    <MenuItem sx={{ fontSize: 14 }} onClick={handleSignUp}>Sign up</MenuItem>
+                  </>
+              }
             </Menu>
           </div>
         </Toolbar>

@@ -12,13 +12,14 @@ interface AuthContextType {
     setUser: (user: User | null) => void;
     token: string | null;
     setToken: (token: string) => void;
+    signOut: () => void; // Added signOut function
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
-    const [token, setToken] = useState<string | null>(localStorage.getItem("authToken"));
+    const [token, setToken] = useState<string | null>(localStorage.getItem("rbuddy_authToken"));
 
     // Verify token on load
     useEffect(() => {
@@ -28,7 +29,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 const data = await verifyToken(token);
                 setUser(data.user);
             } catch {
-                localStorage.removeItem("authToken");
+                localStorage.removeItem("rbuddy_authToken");
                 setToken(null);
                 setUser(null);
             }
@@ -36,8 +37,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         validateToken();
     }, [token]);
 
+    const signOut = () => {
+        localStorage.removeItem("rbuddy_authToken"); // Remove token from localStorage
+        setToken(null); // Reset token state
+        setUser(null); // Reset user state
+    };
+
     return (
-        <AuthContext.Provider value={{ user, setUser, token, setToken }}>
+        <AuthContext.Provider value={{ user, setUser, token, setToken, signOut }}>
             {children}
         </AuthContext.Provider>
     );
