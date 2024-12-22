@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"nyr/db"
 	"nyr/models"
+
 	"strings"
 	"time"
 
@@ -21,6 +22,7 @@ func CreateResolution(c *gin.Context) {
 		return
 	}
 	newResolution.Resolution = strings.TrimSpace(newResolution.Resolution)
+
 	if newResolution.Resolution == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Resolution cannot be empty"})
 		return
