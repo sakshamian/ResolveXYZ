@@ -21,7 +21,6 @@ func CreateComment(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
 	// Check that the resolution ID and user ID are provided
 	if newComment.RID.IsZero() || newComment.UserID.IsZero() {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "UserID and ResolutionID are required"})

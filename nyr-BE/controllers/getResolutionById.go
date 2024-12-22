@@ -6,14 +6,12 @@ import (
 	"net/http"
 	"nyr/db" // Import the db package to interact with MongoDB
 
-	// Import the models package for the resolution model
-
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-// GetResolutionByID handles fetching a resolution by its ID with the like count, comment count, and all comments.
+// GetResolutionByID handles fetching a resolution by its ID with the like count, comment count, all comments (with user names), and tags.
 func GetResolutionByID(c *gin.Context) {
 	// Get the resolution ID from the URL parameters
 	resolutionID := c.Param("id")
@@ -29,7 +27,7 @@ func GetResolutionByID(c *gin.Context) {
 	// Get the resolutions collection from the database
 	resolutionsCollection := db.GetCollection("resolutions")
 
-	// Aggregate pipeline to get the resolution with likes count, comment count, and all comments
+	// Aggregate pipeline to get the resolution with like count, comment count, all comments, user name, and tags
 	aggPipeline := []bson.M{
 		// Step 1: Match the resolution by ID
 		{
@@ -55,7 +53,25 @@ func GetResolutionByID(c *gin.Context) {
 				"as":           "comments", // Store the matched comments in a field named "comments"
 			},
 		},
-		// Step 4: Add fields for like count and comment count
+		// Step 4: Look up the "users" collection to get the user's name who created the resolution
+		{
+			"$lookup": bson.M{
+				"from":         "users",   // Join with the "users" collection
+				"localField":   "user_id", // Match the user_id in the resolutions collection
+				"foreignField": "_id",     // Match with the _id in the users collection
+				"as":           "user",    // Store the matched user in a field named "user"
+			},
+		},
+		// Step 5: Look up the "users" collection again to get the user's name for each comment
+		{
+			"$lookup": bson.M{
+				"from":         "users",            // Join with the "users" collection
+				"localField":   "comments.user_id", // Match user_id in the comments collection
+				"foreignField": "_id",              // Match with the _id in the users collection
+				"as":           "comment_users",    // Store the matched users in a field named "comment_users"
+			},
+		},
+		// Step 6: Add fields for like count, comment count, user name, and tags
 		{
 			"$addFields": bson.M{
 				"like_count": bson.M{
@@ -64,18 +80,39 @@ func GetResolutionByID(c *gin.Context) {
 				"comment_count": bson.M{
 					"$size": "$comments", // Count the number of comments
 				},
+				"user_name": bson.M{
+					"$arrayElemAt": []interface{}{"$user.name", 0}, // Get the first matched user's name for the resolution
+				},
+				"tags": bson.M{
+					"$ifNull": []interface{}{"$tags", []interface{}{}}, // Ensure there is a tags field even if empty
+				},
 				"comments": bson.M{
-					"$ifNull": []interface{}{"$comments", []interface{}{}}, // Ensure there is a comments field even if empty
+					"$map": bson.M{
+						"input": "$comments",
+						"as":    "comment",
+						"in": bson.M{
+							"$mergeObjects": []interface{}{
+								"$$comment", // Retain the original comment fields
+								bson.M{
+									"user_name": bson.M{
+										"$arrayElemAt": []interface{}{"$comment_users.name", 0}, // Get the user's name for each comment
+									},
+								},
+							},
+						},
+					},
 				},
 			},
 		},
-		// Step 5: Optionally, you can project the fields you want to return (resolution data, likes, comments)
+		// Step 7: Optionally, you can project the fields you want to return (resolution data, likes, comments, user name, tags)
 		{
 			"$project": bson.M{
 				"resolution":    1, // Include the resolution field (or other fields as needed)
 				"like_count":    1, // Include like count
 				"comment_count": 1, // Include comment count
-				"comments":      1, // Include comments
+				"comments":      1, // Include comments (now with user names)
+				"user_name":     1, // Include user name for the resolution
+				"tags":          1, // Include tags array
 				"created_at":    1, // Include created_at field
 				"updated_at":    1, // Include updated_at field
 			},
