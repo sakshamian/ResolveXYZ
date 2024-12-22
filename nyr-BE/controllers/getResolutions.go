@@ -11,16 +11,16 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-// GetResolutions handles the retrieval of paginated resolutions with like count and comment count.
+// GetResolutions handles the retrieval of paginated resolutions with like count, comment count, user name, and tags.
 func GetResolutions(c *gin.Context) {
 	// Get the page and limit query parameters
 	page, err := strconv.Atoi(c.DefaultQuery("page", "1"))
 	if err != nil {
 		page = 1 // default to page 1 if no page parameter is provided or invalid
 	}
-	limit, err := strconv.Atoi(c.DefaultQuery("limit", "6"))
+	limit, err := strconv.Atoi(c.DefaultQuery("limit", "15"))
 	if err != nil {
-		limit = 6 // default to 10 items per page
+		limit = 6 // default to 6 items per page
 	}
 
 	// Calculate skip for pagination
@@ -29,7 +29,7 @@ func GetResolutions(c *gin.Context) {
 	// Get the resolutions collection
 	resolutionsCollection := db.GetCollection("resolutions")
 
-	// Aggregate pipeline to get resolutions with like count and comment count
+	// Aggregate pipeline to get resolutions with like count, comment count, user name, and tags
 	aggPipeline := []bson.M{
 		// Step 1: Look up the "likes" collection to get the like count for each resolution
 		{
@@ -49,7 +49,16 @@ func GetResolutions(c *gin.Context) {
 				"as":           "comments", // Store the matched comments in a field named "comments"
 			},
 		},
-		// Step 3: Add fields for like count and comment count
+		// Step 3: Look up the "users" collection to get the user's name for each resolution
+		{
+			"$lookup": bson.M{
+				"from":         "users",   // Join with the "users" collection
+				"localField":   "user_id", // Match the user_id in the resolutions collection
+				"foreignField": "_id",     // Match with the _id in the users collection
+				"as":           "user",    // Store the matched user in a field named "user"
+			},
+		},
+		// Step 4: Add fields for like count, comment count, user name, and tags
 		{
 			"$addFields": bson.M{
 				"like_count": bson.M{
@@ -58,15 +67,23 @@ func GetResolutions(c *gin.Context) {
 				"comment_count": bson.M{
 					"$size": "$comments", // Count the number of comments
 				},
+				"user_name": bson.M{
+					"$arrayElemAt": []interface{}{"$user.name", 0}, // Get the first matched user name
+				},
+				"tags": bson.M{
+					"$ifNull": []interface{}{"$tags", []interface{}{}},
+				}, // Include the tags array from the resolutions collection
 			},
 		},
-		// Step 4: Optionally, you can project the fields to only return certain fields (optional)
+		// Step 5: Project the required fields including resolution, like count, comment count, user name, tags, and timestamps
 		{
 			"$project": bson.M{
-				"resolution":    1, // Return the resolution field (or any other fields from the resolution)
-				"like_count":    1, // Return the like count
-				"comment_count": 1, // Return the comment count
-				"created_at":    1, // Include created_at field (or any other fields you need)
+				"resolution":    1, // Include the resolution field (or other fields as needed)
+				"like_count":    1, // Include like count
+				"comment_count": 1, // Include comment count
+				"user_name":     1, // Include user name
+				"tags":          1, // Include tags array
+				"created_at":    1, // Include created_at field
 				"updated_at":    1, // Include updated_at field
 			},
 		},
@@ -76,7 +93,7 @@ func GetResolutions(c *gin.Context) {
 				"like_count": -1, // Sort by like count in descending order
 			},
 		},
-		// Step 5: Skip and Limit for pagination
+		// Step 6: Skip and Limit for pagination
 		{
 			"$skip": skip,
 		},
