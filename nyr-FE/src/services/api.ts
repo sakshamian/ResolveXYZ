@@ -29,8 +29,14 @@ export const verifyToken = async (token: string): Promise<any> => {
 
 
 export const fetchResolutions = async (page: number, limit: number = 10) => {
+    const token = localStorage.getItem("token");
     try {
-        const response = await fetch(`${API_BASE_URL}/resolution?page=${page}&limit=${limit}`);
+        const response = await fetch(`${API_BASE_URL}/resolution?page=${page}&limit=${limit}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
         if (!response.ok) {
             throw new Error("Failed to fetch resolutions");
         }
@@ -62,9 +68,13 @@ export const postResolutions = async (resolution: object) => {
 };
 
 export const fetchResolutionById = async (r_id: string) => {
-
+    const token = localStorage.getItem("token");
     try {
-        const response = await fetch(`${API_BASE_URL}/resolution/${r_id}`);
+        const response = await fetch(`${API_BASE_URL}/resolution/${r_id}`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
         if (!response.ok) {
             throw new Error("Failed to fetch resolution data");
         }
@@ -76,6 +86,7 @@ export const fetchResolutionById = async (r_id: string) => {
 };
 
 export const addComment = async (r_id: string, user_id: string, comment: string) => {
+    const token = localStorage.getItem("token");
     const commentData = {
         r_id,
         comment: comment,
@@ -87,6 +98,7 @@ export const addComment = async (r_id: string, user_id: string, comment: string)
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
             },
             body: JSON.stringify(commentData)
         });
