@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Modal, Box, Button, Typography } from '@mui/material';
+import React from 'react';
+import { Modal, Box, Button } from '@mui/material';
 
 interface LogoutModalProps {
     open: boolean;

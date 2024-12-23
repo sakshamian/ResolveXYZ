@@ -38,3 +38,23 @@ export const fetchResolutions = async (page: number, limit: number = 10) => {
         throw error;
     }
 };
+
+export const postResolutions = async (resolution: object) => {
+    const token = localStorage.getItem("token");
+    try {
+        const response = await fetch(`${API_BASE_URL}/resolution`, {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(resolution)
+        });
+        if (!response.ok) {
+            throw new Error("Failed to fetch resolutions");
+        }
+        return await response.json();
+    } catch (error) {
+        console.error("API Error:", error);
+        throw error;
+    }
+};

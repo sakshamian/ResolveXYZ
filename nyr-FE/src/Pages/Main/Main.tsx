@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { Box, Button, Chip, FormControl, InputLabel, MenuItem, Modal, Select, TextField, Typography } from "@mui/material";
-import { fetchResolutions } from "../../services/api";
+import { fetchResolutions, postResolutions } from "../../services/api";
 import ResolutionCard from "../../Components/Card/ResolutionCard";
 import "./Main.css";
 import HourglassLoader from "../../Components/Loader/Loader";
 import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
+import ResolutionModal from "../../Components/Modal/ResolutionModal";
 
 interface Resolution {
     _id: string;
@@ -42,9 +43,14 @@ const Main = () => {
     const handleOpen = () => setIsModalOpen(true);  // Open modal
     const handleClose = () => setIsModalOpen(false);
 
+    const handleSubmitResolution = (resolution: { resolution: string; tags: string[] }) => {
+        postResolutions(resolution);
+    };
+
     const loadCards = async () => {
         try {
             const data = await fetchResolutions(page);
+            setPage(page + 1);
             setCards((prevResolutions) => [...prevResolutions, ...data.resolutions]);
             setHasMore(data.has_more);
         } catch (error) {
@@ -213,6 +219,11 @@ const Main = () => {
                     </Box>
                 </InfiniteScroll>
             </div>
+            <ResolutionModal
+                open={isModalOpen}
+                onClose={handleClose}
+                onSubmit={handleSubmitResolution}
+            />
         </div>
     );
 };
