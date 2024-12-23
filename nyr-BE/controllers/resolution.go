@@ -27,6 +27,10 @@ func CreateResolution(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Resolution cannot be empty"})
 		return
 	}
+
+	userId := c.GetString("user_id")
+	userObjectID, _ := primitive.ObjectIDFromHex(userId)
+	newResolution.UserID = userObjectID
 	newResolution.RID = primitive.NewObjectID()
 	newResolution.CreatedAt = time.Now()
 	newResolution.UpdatedAt = time.Now()

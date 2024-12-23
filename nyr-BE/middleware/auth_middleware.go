@@ -14,7 +14,7 @@ var jwtKey = []byte(os.Getenv("JWT_SECRET_KEY"))
 
 // Claims to use in future
 type Claims struct {
-	Username string `json:"username"`
+	UserId string `json:"user_id"`
 	jwt.StandardClaims
 }
 
@@ -55,7 +55,49 @@ func AuthMiddleware() gin.HandlerFunc {
 
 		// Extract claims (you can use these in your handlers)
 		if claims, ok := token.Claims.(*Claims); ok && token.Valid {
-			c.Set("username", claims.Username)
+			c.Set("user_id", claims.UserId)
+		} else {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token claims"})
+			c.Abort()
+			return
+		}
+
+		// Proceed to the next handler
+		c.Next()
+	}
+}
+
+func PostsMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Get the token from the Authorization header
+		authHeader := c.GetHeader("Authorization")
+		if authHeader == "" {
+			c.Next()
+		}
+
+		// Token format is "Bearer <token>"
+		tokenString := strings.Split(authHeader, " ")
+		if len(tokenString) != 2 || tokenString[0] != "Bearer" {
+			c.Next()
+		}
+
+		// Parse the JWT token
+		token, err := jwt.ParseWithClaims(tokenString[1], &Claims{}, func(token *jwt.Token) (interface{}, error) {
+			// Check token signing method
+			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+			}
+			return jwtKey, nil
+		})
+
+		// Handle any parsing error or invalid token
+		if err != nil || !token.Valid {
+			c.Next()
+		}
+
+		// Extract claims (you can use these in your handlers)
+		if claims, ok := token.Claims.(*Claims); ok && token.Valid {
+			c.Set("user_id", claims.UserId)
 		} else {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token claims"})
 			c.Abort()

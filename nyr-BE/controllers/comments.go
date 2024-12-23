@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // CreateComment handles the creation of a new comment.
@@ -22,8 +23,8 @@ func CreateComment(c *gin.Context) {
 		return
 	}
 	// Check that the resolution ID and user ID are provided
-	if newComment.RID.IsZero() || newComment.UserID.IsZero() {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "UserID and ResolutionID are required"})
+	if newComment.RID.IsZero() {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ResolutionID is required"})
 		return
 	}
 	newComment.Comment = strings.TrimSpace(newComment.Comment)
@@ -31,7 +32,12 @@ func CreateComment(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Comment cannot be empty"})
 		return
 	}
+
+	userId := c.GetString("user_id")
+	userObjectID, _ := primitive.ObjectIDFromHex(userId)
+
 	// Set created and updated times
+	newComment.UserID = userObjectID
 	newComment.CreatedAt = time.Now()
 	newComment.UpdatedAt = time.Now()
 
