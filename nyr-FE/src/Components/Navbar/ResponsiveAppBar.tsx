@@ -46,9 +46,9 @@ function ResponsiveAppBar() {
       <Container maxWidth="xl">
         <Toolbar disableGutters sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
           {/* <AdbIcon sx={{ display: 'flex', mr: 1, color: "yellow" }} /> */}
-          <Box>
-            Resolution Hub
-          </Box>
+          <div style={{ fontSize: '20px', fontWeight: '400' }}>
+            ResolveXYZ
+          </div>
           <div>
             <Button
               id="basic-button"

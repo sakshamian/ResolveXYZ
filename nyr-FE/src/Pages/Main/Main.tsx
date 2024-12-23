@@ -55,7 +55,8 @@ const Main = () => {
         try {
             const data = await fetchResolutions(page);
             setPage(page + 1);
-            setCards((prevResolutions) => [...prevResolutions, ...data.resolutions]);
+            if (!data.resolutions) setCards([])
+            else setCards((prevResolutions) => [...prevResolutions, ...data.resolutions]);
             setHasMore(data.has_more);
         } catch (error) {
             console.error("Failed to load cards:", error);
@@ -215,8 +216,7 @@ const Main = () => {
                         p={2}
                         justifyContent="space-between"
                     >
-                        {cards.map((card, ind) => {
-                            console.log(card);
+                        {cards?.map((card, ind) => {
                             return (
                                 <Box
                                     key={ind}
