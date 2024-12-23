@@ -29,8 +29,34 @@ export const verifyToken = async (token: string): Promise<any> => {
 
 
 export const fetchResolutions = async (page: number, limit: number = 10) => {
+    const token = localStorage.getItem("token");
     try {
-        const response = await fetch(`${API_BASE_URL}/resolution?page=${page}&limit=${limit}`);
+        const response = await fetch(`${API_BASE_URL}/resolution?page=${page}&limit=${limit}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+        if (!response.ok) {
+            throw new Error("Failed to fetch resolutions");
+        }
+        return await response.json();
+    } catch (error) {
+        console.error("API Error:", error);
+        throw error;
+    }
+};
+
+export const postResolutions = async (resolution: object) => {
+    const token = localStorage.getItem("token");
+    try {
+        const response = await fetch(`${API_BASE_URL}/resolution`, {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(resolution)
+        });
         if (!response.ok) {
             throw new Error("Failed to fetch resolutions");
         }
@@ -42,9 +68,13 @@ export const fetchResolutions = async (page: number, limit: number = 10) => {
 };
 
 export const fetchResolutionById = async (r_id: string) => {
-
+    const token = localStorage.getItem("token");
     try {
-        const response = await fetch(`${API_BASE_URL}/resolution/${r_id}`);
+        const response = await fetch(`${API_BASE_URL}/resolution/${r_id}`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
         if (!response.ok) {
             throw new Error("Failed to fetch resolution data");
         }
@@ -56,24 +86,26 @@ export const fetchResolutionById = async (r_id: string) => {
 };
 
 export const addComment = async (r_id: string, user_id: string, comment: string) => {
+    const token = localStorage.getItem("token");
     const commentData = {
-        r_id,          
-        comment: comment,  
-        user_id,       
+        r_id,
+        comment: comment,
+        user_id,
     };
-   console.log(commentData)
+    console.log(commentData)
     try {
         const response = await fetch(`${API_BASE_URL}/resolution/comments`, {
-            method: 'POST', 
+            method: 'POST',
             headers: {
-                'Content-Type': 'application/json',  
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
             },
             body: JSON.stringify(commentData)
         });
         if (!response.ok) {
             throw new Error("Failed to fetch resolution data");
         }
-        return await response.json(); 
+        return await response.json();
     } catch (error) {
         console.error("API Error:", error);
         throw error;

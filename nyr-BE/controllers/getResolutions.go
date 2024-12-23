@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"nyr/db"
@@ -13,6 +14,15 @@ import (
 
 // GetResolutions handles the retrieval of paginated resolutions with like count, comment count, user name, and tags.
 func GetResolutions(c *gin.Context) {
+	isLoggedIn := false
+	userId := c.GetString("user_id")
+
+	if userId != "" {
+		isLoggedIn = true
+	}
+
+	fmt.Println(isLoggedIn, userId, "check")
+
 	// Get the page and limit query parameters
 	page, err := strconv.Atoi(c.DefaultQuery("page", "1"))
 	if err != nil {

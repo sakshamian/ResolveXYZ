@@ -104,7 +104,6 @@ func GoogleLoginLatest(c *gin.Context) {
 	// Validate the token with Google's API
 	tokenInfoURL := fmt.Sprintf("https://oauth2.googleapis.com/tokeninfo?id_token=%s", requestBody.Token)
 
-	fmt.Println("asds")
 	resp, err := http.Get(tokenInfoURL)
 	if err != nil || resp.StatusCode != http.StatusOK {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid Google token"})

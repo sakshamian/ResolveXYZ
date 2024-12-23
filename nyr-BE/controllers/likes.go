@@ -15,9 +15,11 @@ import (
 
 func ToggleLikeResolution(c *gin.Context) {
 	var request struct {
-		UserID primitive.ObjectID `json:"user_id" binding:"required"`
-		RID    primitive.ObjectID `json:"r_id" binding:"required"`
+		RID primitive.ObjectID `json:"r_id" binding:"required"`
 	}
+
+	userId := c.GetString("user_id")
+	userObjectID, _ := primitive.ObjectIDFromHex(userId)
 
 	// Bind the incoming JSON to the request struct
 	if err := c.ShouldBindJSON(&request); err != nil {
@@ -29,7 +31,7 @@ func ToggleLikeResolution(c *gin.Context) {
 	collection := db.GetCollection("likes")
 
 	filter := bson.D{
-		bson.E{Key: "user_id", Value: request.UserID},
+		bson.E{Key: "user_id", Value: userObjectID},
 		bson.E{Key: "r_id", Value: request.RID},
 	}
 
@@ -52,7 +54,7 @@ func ToggleLikeResolution(c *gin.Context) {
 	// If no like exists, insert a new like (like the post)
 	newLike := models.Likes{
 		ID:        primitive.NewObjectID(),
-		UserID:    request.UserID,
+		UserID:    userObjectID,
 		RID:       request.RID,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),

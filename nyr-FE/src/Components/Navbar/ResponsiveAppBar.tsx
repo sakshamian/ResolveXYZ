@@ -1,20 +1,22 @@
-import React from 'react'
+import React, { useState } from 'react'
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Menu from '@mui/material/Menu';
 import Container from '@mui/material/Container';
 import MenuItem from '@mui/material/MenuItem';
-import AdbIcon from '@mui/icons-material/Adb';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import { Box, Button } from '@mui/material';
+import { Avatar, Box, Button } from '@mui/material';
 import { useAuth } from '../../Context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import LogoutModal from '../Modal/LogoutModal';
 
 function ResponsiveAppBar() {
   const navigate = useNavigate();
   const { user, token, signOut } = useAuth();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
+  const [logoutModalOpen, setLogoutModalOpen] = useState(false);
+
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -27,6 +29,7 @@ function ResponsiveAppBar() {
   };
 
   const handleSignOut = () => {
+
     signOut();
     navigate('/');
   };
@@ -39,7 +42,7 @@ function ResponsiveAppBar() {
   const isLoggedIn = user !== null && token !== null;
 
   return (
-    <AppBar position="static" sx={{ backgroundColor: '#181c23' }}>
+    <AppBar position="sticky" sx={{ backgroundColor: '#181c23' }}>
       <Container maxWidth="xl">
         <Toolbar disableGutters sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
           {/* <AdbIcon sx={{ display: 'flex', mr: 1, color: "yellow" }} /> */}
@@ -54,7 +57,13 @@ function ResponsiveAppBar() {
               aria-expanded={open ? 'true' : undefined}
               onClick={handleClick}
             >
-              <AccountCircleIcon sx={{ fontSize: 35, color: '#fff' }} />
+              {isLoggedIn ?
+                <Avatar alt={user.name}
+                  src={user.profile}
+                  sx={{ width: 40, height: 40 }} />
+                :
+                <AccountCircleIcon sx={{ fontSize: 35, color: '#fff' }} />}
+
             </Button>
             <Menu
               id="basic-menu"
@@ -76,7 +85,10 @@ function ResponsiveAppBar() {
                 isLoggedIn ?
                   <>
                     <MenuItem sx={{ fontSize: 14 }} onClick={handleClose}>My resolutions</MenuItem>
-                    <MenuItem sx={{ fontSize: 14 }} onClick={handleSignOut}>Sign out</MenuItem>
+                    <MenuItem sx={{ fontSize: 14 }} onClick={() => {
+                      setAnchorEl(null);
+                      setLogoutModalOpen(true);
+                    }}>Sign out</MenuItem>
                   </> :
                   <>
                     <MenuItem sx={{ fontSize: 14 }} onClick={handleSignIn}>Sign in</MenuItem>
@@ -87,6 +99,7 @@ function ResponsiveAppBar() {
           </div>
         </Toolbar>
       </Container>
+      <LogoutModal open={logoutModalOpen} onClose={() => setLogoutModalOpen(false)} onLogout={handleSignOut} />
     </AppBar>
   );
 }

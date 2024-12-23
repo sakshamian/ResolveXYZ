@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"nyr/db" // Import the db package to interact with MongoDB
@@ -13,6 +14,15 @@ import (
 
 // GetResolutionByID handles fetching a resolution by its ID with the like count, comment count, all comments (with user names), and tags.
 func GetResolutionByID(c *gin.Context) {
+	isLoggedIn := false
+	userId := c.GetString("user_id")
+
+	if userId != "" {
+		isLoggedIn = true
+	}
+
+	fmt.Println(isLoggedIn, userId, "check")
+
 	// Get the resolution ID from the URL parameters
 	resolutionID := c.Param("id")
 

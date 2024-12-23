@@ -16,16 +16,20 @@ func InitRoutes(router *gin.Engine) {
 
 	// auth routes
 	router.GET("/auth/google", controllers.GoogleLogin)
-	// router.GET("/auth/google/callback", controllers.GoogleCallback)
 	router.POST("/auth/google/callback", controllers.GoogleLoginLatest)
+
+	// token verification
+	router.GET("/verify-token", controllers.VerifyTokenHandler)
 
 	// resolution routes
 	resolutionRoutes := router.Group("resolution")
 	{
+		resolutionRoutes.GET("", middleware.PostsMiddleware(), controllers.GetResolutions)
+		resolutionRoutes.GET("/:id", middleware.PostsMiddleware(), controllers.GetResolutionByID)
+
+		resolutionRoutes.Use(middleware.AuthMiddleware())
 		resolutionRoutes.POST("", controllers.CreateResolution)
 		resolutionRoutes.POST("/likes", controllers.ToggleLikeResolution)
 		resolutionRoutes.POST("/comments", controllers.CreateComment)
-		resolutionRoutes.GET("", controllers.GetResolutions)
-		resolutionRoutes.GET("/:id", controllers.GetResolutionByID)
 	}
 }
