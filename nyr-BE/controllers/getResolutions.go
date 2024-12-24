@@ -10,18 +10,29 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
-// GetResolutions handles the retrieval of paginated resolutions with like count, comment count, user name, and tags.
 func GetResolutions(c *gin.Context) {
+	// Check if the user is logged in
 	isLoggedIn := false
 	userId := c.GetString("user_id")
-
 	if userId != "" {
 		isLoggedIn = true
 	}
 
-	fmt.Println(isLoggedIn, userId, "check")
+	// Convert string user ID to ObjectID if logged in
+	var userObjectID primitive.ObjectID
+	var err error
+	if isLoggedIn {
+		userObjectID, err = primitive.ObjectIDFromHex(userId)
+		if err != nil {
+			log.Printf("Error converting userId to ObjectID: %v", err)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid user ID"})
+			return
+		}
+	}
 
 	// Get the page and limit query parameters
 	page, err := strconv.Atoi(c.DefaultQuery("page", "1"))
@@ -39,8 +50,8 @@ func GetResolutions(c *gin.Context) {
 	// Get the resolutions collection
 	resolutionsCollection := db.GetCollection("resolutions")
 
-	// Aggregate pipeline to get resolutions with like count, comment count, user name, user_id, and tags
-	aggPipeline := []bson.M{
+	// Query to get resolutions with like count, comment count, and user information
+	cursor, err := resolutionsCollection.Aggregate(context.Background(), []bson.M{
 		// Step 1: Look up the "likes" collection to get the like count for each resolution
 		{
 			"$lookup": bson.M{
@@ -59,65 +70,37 @@ func GetResolutions(c *gin.Context) {
 				"as":           "comments", // Store the matched comments in a field named "comments"
 			},
 		},
-		// Step 3: Look up the "users" collection to get the user's name and user_id for each resolution
+		// Step 3: Look up the "users" collection to get the user's name
 		{
 			"$lookup": bson.M{
 				"from":         "users",   // Join with the "users" collection
-				"localField":   "user_id", // Match the user_id in the resolutions collection
-				"foreignField": "_id",     // Match with the _id in the users collection
+				"localField":   "user_id", // Match the user_id in resolutions
+				"foreignField": "_id",     // Match with the _id in users
 				"as":           "user",    // Store the matched user in a field named "user"
 			},
 		},
-		// Step 4: Add fields for like count, comment count, user name, user_id, and tags
-		{
-			"$addFields": bson.M{
-				"like_count": bson.M{
-					"$size": "$likes", // Count the number of likes
-				},
-				"comment_count": bson.M{
-					"$size": "$comments", // Count the number of comments
-				},
-				"user_name": bson.M{
-					"$arrayElemAt": []interface{}{"$user.name", 0}, // Get the first matched user name
-				},
-				"user_id": bson.M{
-					"$arrayElemAt": []interface{}{"$user._id", 0}, // Get the first matched user ID
-				},
-				"tags": bson.M{
-					"$ifNull": []interface{}{"$tags", []interface{}{}},
-				}, // Include the tags array from the resolutions collection
-			},
-		},
-		// Step 5: Project the required fields including resolution, like count, comment count, user name, tags, user_id, and timestamps
+		// Step 4: Project required fields including like count, comment count, tags, and user information
 		{
 			"$project": bson.M{
-				"resolution":    1, // Include the resolution field (or other fields as needed)
-				"like_count":    1, // Include like count
-				"comment_count": 1, // Include comment count
-				"user_name":     1, // Include user name
-				"user_id":       1, // Include user ID
-				"tags":          1, // Include tags array
-				"created_at":    1, // Include created_at field
-				"updated_at":    1, // Include updated_at field
+				"resolution":    1,                                                      // Include the resolution field
+				"like_count":    bson.M{"$size": "$likes"},                              // Count likes
+				"comment_count": bson.M{"$size": "$comments"},                           // Count comments
+				"tags":          1,                                                      // Include tags array
+				"user_id":       1,                                                      // Include user_id to link the resolution to the user
+				"created_at":    1,                                                      // Include created_at field
+				"updated_at":    1,                                                      // Include updated_at field
+				"user_name":     bson.M{"$arrayElemAt": []interface{}{"$user.name", 0}}, // Get the user's name
 			},
 		},
-		// Optional: Sort by like count in descending order (optional)
-		{
-			"$sort": bson.M{
-				"like_count": -1, // Sort by like count in descending order
-			},
-		},
-		// Step 6: Skip and Limit for pagination
+		// Step 5: Skip and Limit for pagination
 		{
 			"$skip": skip,
 		},
 		{
 			"$limit": limit,
 		},
-	}
+	})
 
-	// Execute the aggregation query
-	cursor, err := resolutionsCollection.Aggregate(context.Background(), aggPipeline)
 	if err != nil {
 		log.Printf("Error during aggregation: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve resolutions"})
@@ -125,29 +108,47 @@ func GetResolutions(c *gin.Context) {
 	}
 	defer cursor.Close(context.Background())
 
-	// Parse the aggregation result
-	var results []bson.M
-	if err := cursor.All(context.Background(), &results); err != nil {
+	// Parse the aggregation result into a slice of resolutions
+	var resolutions []bson.M
+	if err := cursor.All(context.Background(), &resolutions); err != nil {
 		log.Printf("Error parsing aggregation result: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to parse result"})
 		return
 	}
 
-	// Get the total count of resolutions to determine if there are more to load
-	totalCount, err := resolutionsCollection.CountDocuments(context.Background(), bson.M{})
-	if err != nil {
-		log.Printf("Error counting documents: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to count resolutions"})
-		return
-	}
+	// If user is logged in, check if user has liked any resolution
+	for i := range resolutions {
+		rID, ok := resolutions[i]["_id"].(primitive.ObjectID)
+		fmt.Println("r_id:", rID)
+		if ok {
+			// Query the "likes" collection to check if the logged-in user has liked this resolution
+			likeFilter := bson.M{
+				"user_id": userObjectID, // Match the logged-in user_id
+				"r_id":    rID,          // Match the current resolution_id
+			}
 
-	// Convert page * limit to int64 for comparison
-	hasMore := int64(page*limit) < totalCount
+			// Use FindOne to check if the user has liked this resolution
+			var userLike bson.M
+			err := db.GetCollection("likes").FindOne(context.Background(), likeFilter).Decode(&userLike)
+			if err != nil {
+				// If no like document is found, the user has not liked this resolution
+				if err == mongo.ErrNoDocuments {
+					resolutions[i]["isLiked"] = false
+				} else {
+					log.Printf("Error checking user like: %v", err)
+					c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to check user likes"})
+					return
+				}
+			} else {
+				// If a like document is found, the user has liked this resolution
+				resolutions[i]["isLiked"] = true
+			}
+		}
+	}
 
 	// Return the results along with pagination info
 	c.JSON(http.StatusOK, gin.H{
-		"resolutions": results,
-		"has_more":    hasMore,
+		"resolutions": resolutions,
 		"page":        page,
 		"limit":       limit,
 	})
