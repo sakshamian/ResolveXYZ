@@ -1,10 +1,12 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
 import { useNavigate } from 'react-router-dom';
 import './Auth.css';
 import { useAuth } from '../../Context/AuthContext';
+import UpdateProfileModal from '../../Components/Modal/UpdateProfileModal';
 
 const SignIn: React.FC = () => {
+    const [updateProfileModalOpen, setUpdateProfileModalOpen] = useState(false);
     const { setToken } = useAuth();
     const navigate = useNavigate();
 
@@ -25,7 +27,17 @@ const SignIn: React.FC = () => {
                     const data = await res.json();
                     localStorage.setItem('token', data.token);
                     setToken(data.token);
-                    navigate('/');
+                    if (data.firstLogin) {
+                        <UpdateProfileModal open={updateProfileModalOpen}
+                            onClose={() => {
+                                setUpdateProfileModalOpen(false);
+                                navigate('/');
+                            }}
+                            defaultName={data.user.name}
+                            heading="Enter your name"
+                        />
+                    }
+                    else navigate('/');
                 } else {
                     console.error('Authentication failed:', res.statusText);
                 }

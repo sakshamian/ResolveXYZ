@@ -4,14 +4,38 @@ import App from './App.tsx'
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 const theme = createTheme({
+  palette: {
+    mode: 'dark',
+  },
+  components: {
+    MuiMenuItem: {
+      styleOverrides: {
+        root: {
+          fontFamily: 'Comic Neue, sans-serif',
+        },
+      },
+    },
+    MuiOutlinedInput: {
+      styleOverrides: {
+        input: {
+          paddingTop: 10, // Removes top padding
+          paddingBottom: 10, // Removes bottom padding
+        },
+      },
+    },
+    MuiAppBar: {
+      styleOverrides: {
+        root: {
+          backgroundColor: '#181c23', // Set custom background color for AppBar
+        },
+      },
+    },
+  },
   typography: {
     button: {
       fontFamily: 'Comic Neue, sans-serif',
       fontWeight: 500
     },
-    // menu: {
-    //   fontFamily: "Comic Sans MS, cursive", // Custom font for MenuItem
-    // }
   },
 });
 
