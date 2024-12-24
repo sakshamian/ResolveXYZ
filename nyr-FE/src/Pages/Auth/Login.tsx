@@ -59,16 +59,15 @@ const SignIn: React.FC = () => {
         <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_OAUTH_CLIENT_ID}>
             <div className="auth-container">
                 <div className="auth-form">
-                    {/* <h2>Sign In</h2> */}
+                    <p style={{ fontSize: '16px', marginBottom: '15px' }}>
+                        Log in/ sign up using Google
+                    </p>
                     <GoogleLogin
                         onSuccess={handleLoginSuccess}
                         onError={handleLoginFailure}
-                        text="signin_with"
+                        text="continue_with"
                     // useOneTap
                     />
-                    <p onClick={toggleAuthMethod} style={{ cursor: 'pointer', textDecoration: 'underline', fontSize: '14px', marginTop: '15px' }}>
-                        Don't have an account? Sign Up
-                    </p>
                 </div>
             </div>
         </GoogleOAuthProvider>

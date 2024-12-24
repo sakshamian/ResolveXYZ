@@ -4,7 +4,7 @@ import ResponsiveAppBar from './Components/Navbar/ResponsiveAppBar'
 import { AuthProvider } from './Context/AuthContext'
 import Main from './Pages/Main/Main'
 import ProtectedRoute from './Components/ProtectedRoute/ProtectedRoute'
-import SignIn from './Pages/Auth/SignIn'
+import SignIn from './Pages/Auth/Login'
 import SignUp from './Pages/Auth/SignUp'
 
 function App() {
@@ -29,15 +29,12 @@ function App() {
             }
           />
           <Route
-            path="/sign-up"
-            element={
-              <SignUp />
-            }
-          />
-          <Route
             path="/sign-in"
             element={
-              <SignIn />
+              <>
+                <ResponsiveAppBar />
+                <SignIn />
+              </>
             }
           />
         </Routes>

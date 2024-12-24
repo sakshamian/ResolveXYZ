@@ -8,8 +8,11 @@ const theme = createTheme({
     button: {
       fontFamily: 'Comic Neue, sans-serif',
       fontWeight: 500
-    }
-  }
+    },
+    // menu: {
+    //   fontFamily: "Comic Sans MS, cursive", // Custom font for MenuItem
+    // }
+  },
 });
 
 createRoot(document.getElementById('root')!).render(

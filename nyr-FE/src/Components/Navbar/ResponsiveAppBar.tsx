@@ -9,6 +9,7 @@ import { Avatar, Box, Button } from '@mui/material';
 import { useAuth } from '../../Context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import LogoutModal from '../Modal/LogoutModal';
+import LoginIcon from '@mui/icons-material/Login';
 
 function ResponsiveAppBar() {
   const navigate = useNavigate();
@@ -45,7 +46,6 @@ function ResponsiveAppBar() {
     <AppBar position="sticky" sx={{ backgroundColor: '#181c23' }}>
       <Container maxWidth="xl">
         <Toolbar disableGutters sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-          {/* <AdbIcon sx={{ display: 'flex', mr: 1, color: "yellow" }} /> */}
           <div style={{ fontSize: '20px', fontWeight: '400' }}>
             ResolveXYZ
           </div>
@@ -91,8 +91,10 @@ function ResponsiveAppBar() {
                     }}>Sign out</MenuItem>
                   </> :
                   <>
-                    <MenuItem sx={{ fontSize: 14 }} onClick={handleSignIn}>Sign in</MenuItem>
-                    <MenuItem sx={{ fontSize: 14 }} onClick={handleSignUp}>Sign up</MenuItem>
+                    <MenuItem sx={{ fontSize: 14 }} onClick={handleSignIn}>
+                      <LoginIcon />
+                      Log in
+                    </MenuItem>
                   </>
               }
             </Menu>
