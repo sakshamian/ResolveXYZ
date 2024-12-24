@@ -40,7 +40,7 @@ function ResponsiveAppBar() {
   const isLoggedIn = user !== null && token !== null;
 
   return (
-    <AppBar position="sticky" sx={{ backgroundColor: '#181c23' }}>
+    <AppBar position="sticky" sx={{ background: '#181c23' }} >
       <Container maxWidth="xl">
         <Toolbar disableGutters sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
           <div style={{ fontSize: '20px', fontWeight: '400' }}>
