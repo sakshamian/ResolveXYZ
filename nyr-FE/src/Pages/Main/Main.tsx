@@ -20,6 +20,7 @@ interface Resolution {
     tags: string[];
     user_name: string;
     user_id: string;
+    hasLiked:boolean;
 }
 
 const Main = () => {
@@ -55,7 +56,7 @@ const Main = () => {
             }
 
             setCards((prevResolutions) => [...prevResolutions, ...data.resolutions]);
-
+            console.log(data)
             if (data.resolutions.length < 10) {
                 setHasMore(false); // No more items to fetch
             }
@@ -131,6 +132,7 @@ const Main = () => {
                                         tags={card.tags}
                                         r_id={card._id}
                                         user_id={card.user_id}
+                                        hasLiked={card.hasLiked}
                                     />
                                 </Box>
                             );
