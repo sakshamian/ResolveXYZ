@@ -22,19 +22,6 @@ interface ResolutionModalProps {
     }) => void;
 }
 
-const availableTags = [
-    { tag: 'Productivity', color: '#4CAF50' },
-    { tag: 'Health', color: '#FF6347' },
-    { tag: 'Education', color: '#1E90FF' },
-    { tag: 'Career', color: '#FFD700' },
-    { tag: 'Fitness', color: '#32CD32' },
-    { tag: 'Finance', color: '#FF8C00' },
-    { tag: 'Family', color: '#FF1493' },
-    { tag: 'Happiness', color: '#FFEB3B' },
-    { tag: 'Mindfulness', color: '#B0E0E6' },
-    { tag: 'Technology', color: '#0000FF' },
-];
-
 const ResolutionModal: React.FC<ResolutionModalProps> = ({ open, onClose, onSubmit }) => {
     const [description, setDescription] = useState('');
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
@@ -112,7 +99,6 @@ const ResolutionModal: React.FC<ResolutionModalProps> = ({ open, onClose, onSubm
                     renderValue={(selected) => (
                         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                             {(selected as string[]).map((tag) => {
-                                const tagObj = availableTags.find(t => t.tag === tag);
                                 return (
                                     <Chip
                                         key={tag}
@@ -122,15 +108,12 @@ const ResolutionModal: React.FC<ResolutionModalProps> = ({ open, onClose, onSubm
                                             event.stopPropagation();
                                         }}
                                         sx={{
-                                            borderColor: tagObj?.color,
-                                            borderWidth: 2,
-                                            borderStyle: 'solid',
-                                            backgroundColor: 'transparent',
-                                            color: tagObj?.color,
+                                            backgroundColor: ' #242936',
+                                            color: '#fff',  // Dark text color for contrast
                                             borderRadius: '16px',
-                                            padding: '5px 10px',
+                                            padding: '5px ',
                                             '&:hover': {
-                                                borderColor: tagObj?.color,
+                                                borderColor: '#8C8C8C',  // Slightly darker on hover
                                             },
                                         }}
                                     />
@@ -139,9 +122,9 @@ const ResolutionModal: React.FC<ResolutionModalProps> = ({ open, onClose, onSubm
                         </Box>
                     )}
                 >
-                    {availableTags.map((availableTag) => (
-                        <MenuItem key={availableTag.tag} value={availableTag.tag}>
-                            {availableTag.tag}
+                    {['Productivity', 'Family', 'Health', 'Education', 'Fitness', 'Finance', 'Career', 'Happiness', 'Mindfulness'].map((tag) => (
+                        <MenuItem key={tag} value={tag}>
+                            {tag}
                         </MenuItem>
                     ))}
                 </Select>

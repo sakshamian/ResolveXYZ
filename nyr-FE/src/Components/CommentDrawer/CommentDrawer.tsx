@@ -11,16 +11,19 @@ import RedirectToLoginModal from '../Modal/RedirectToLoginModal';
 import { useAuth } from '../../Context/AuthContext';
 
 const availableTags = [
-    { tag: 'Productivity', color: '#4CAF50' },
-    { tag: 'Health', color: '#FF6347' },
-    { tag: 'Education', color: '#1E90FF' },
-    { tag: 'Career', color: '#FFD700' },
-    { tag: 'Fitness', color: '#32CD32' },
-    { tag: 'Finance', color: '#FF8C00' },
-    { tag: 'Family', color: '#FF1493' },
-    { tag: 'Happiness', color: '#FFEB3B' },
-    { tag: 'Mindfulness', color: '#B0E0E6' },
-    { tag: 'Technology', color: '#0000FF' },
+    { tag: 'Productivity', c: 'rgb(134 239 172/var(--tw-text-opacity,1))', bgc: 'rgba(5,46,22,.4)', bc: 'rgba(5,46,22,.4)' },
+    { tag: 'Family', c: 'rgb(216 180 254 / var(--tw-text-opacity, 1))', bgc: 'rgba(59, 7, 100, .4)', bc: 'rgb(107 33 168 / 1)' },
+    { tag: 'Health', c: 'rgb(134 239 172 / var(--tw-text-opacity, 1))', bgc: ' rgba(5, 46, 22, .4)', bc: 'rgb(22 101 52/var(--tw-border-opacity,1))' },
+    { tag: 'Education', c: 'rgb(147 197 253/var(--tw-text-opacity,1))', bgc: 'rgba(23,37,84,.4)', bc: 'rgb(30 64 175/var(--tw-border-opacity,1))' },
+    { tag: 'Fitness', color: 'rgb(216 180 254/var(--tw-text-opacity,1))', bgc: 'rgba(59,7,100,.4)', bc: 'rgb(107 33 168/var(--tw-border-opacity,1))' },
+    { tag: 'Finance', c: 'rgb(209 213 219/var(--tw-text-opacity,1))', bgc: 'rgba(17,24,39,.4)', bc: 'rgb(31 41 55/var(--tw-border-opacity,1))' },
+    { tag: 'Career', c: 'rgb(253 186 116/var(--tw-text-opacity,1))', bgc: 'rgba(67,20,7,.4)', bc: 'rgb(154 52 18/var(--tw-border-opacity,1))' },
+    { tag: 'Happiness', c: 'rgb(216 180 254 / var(--tw-text-opacity, 1))', bgc: 'rgba(59, 7, 100, .4)', bc: 'rgb(107 33 168 / 1)' },
+    { tag: 'Mindfulness', c: 'rgb(216 180 254 / var(--tw-text-opacity, 1))', bgc: 'rgba(59, 7, 100, .4)', bc: 'rgb(107 33 168 / 1)' },
+    {
+        tag: 'Technology',
+        c: 'rgb(147 197 253/var(--tw-text-opacity,1))', bgc: 'rgba(23,37,84,.4)', bc: 'rgb(30 64 175/var(--tw-border-opacity,1))'
+    },
 ];
 
 interface UserDetail {
@@ -203,24 +206,38 @@ const CommentDrawer: React.FC<CommentDrawerProps> = ({
             </Box>
 
             {/* Tags */}
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '10px', p: 2 }}>
-                {tags.map((tag, index) => (
-                    <Chip
-                        key={index}
-                        label={tag}
-                        sx={{
-                            borderColor: "#242936",
-                            borderWidth: 1,
-                            borderStyle: 'solid',
-                            backgroundColor: '#242936',
-                            color: getTagColor(tag),
-                        }}
-                    />
-                ))}
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '10px', p: 2 }}  >
+                {tags.map((tag, index) => {
+                    // Find the corresponding tag data in the availableTags array
+                    const tagData = availableTags.find(item => item.tag === tag);
+
+                    return (
+                        <Chip
+                            key={index}
+                            label={tag}
+                            sx={{
+                                height: '30px',
+                                borderWidth: 1,
+                                borderStyle: 'solid',
+                                backgroundColor: tagData?.bgc || 'rgba(0, 0, 0, 0.1)', // Default background if not found
+                                borderColor: tagData?.bc || '#ccc', // Default border if not found
+                                color: tagData?.c || '#fff', // Default text color if not found
+                                fontSize: '14px',
+                                fontWeight: '500',
+                                cursor: 'pointer',
+                                transition: 'all 0.3s ease',
+                                '&:hover': {
+                                    backgroundColor: tagData?.bc || '#ccc', // Change background on hover
+                                    color: 'white', // Optional hover effect
+                                },
+                            }}
+                        />
+                    );
+                })}
             </Box>
 
             {/* Likes and Comments */}
-            <Box display="flex" alignItems="center" justifyContent="space-between" p={2}>
+            <Box display="flex" alignItems="center" gap={2} p={2}>
                 <Box display="flex" alignItems="center" onClick={handleLikeResolution} sx={{ cursor: 'pointer' }}>
                     {localHasLiked ? (
                         <FavoriteIcon sx={{ marginRight: 1, color: "#E03673" }} />
