@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { CardContent, CardActions, Typography, IconButton, Box, Card } from '@mui/material';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import CommentIcon from '@mui/icons-material/Comment';
-import { fetchResolutionById } from '../../services/api';
+import { fetchResolutionById, likeResolution } from '../../services/api';
 import { convertTimeToDaysAgo } from '../../utils/utils';
 import CommentDrawer from '../CommentDrawer/CommentDrawer';  // Import the CommentDrawer component
 
@@ -16,11 +16,11 @@ interface CartProps {
     createdAt: string;
     tags: string[];
     r_id: string;
-    user_id:string;
+    user_id: string;
 }
 
 const ResolutionCard: React.FC<CartProps> = ({ ideaTitle, ideaDescription, likeCount, commentCount, createdAt, tags, r_id, user_id }) => {
-  
+
     interface Comment {
         _id: string; // Unique ID for the comment
         comment: string; // The comment text
@@ -33,30 +33,34 @@ const ResolutionCard: React.FC<CartProps> = ({ ideaTitle, ideaDescription, likeC
 
     const [liked, setLiked] = useState<boolean>(false);
     const [isCommentDrawerOpen, setIsCommentDrawerOpen] = useState<boolean>(false);
-    const [comments, setComments] = useState<Comment[]>([]); 
-    
+    const [comments, setComments] = useState<Comment[]>([]);
+
     // Toggle the drawer open or close
-  const toggleDrawer = (newOpen: boolean, resolutionId: string) => async () => {
-    setIsCommentDrawerOpen(newOpen); // Open or close the drawer
-    
-    if (!newOpen) return; // If we're closing the drawer, do nothing
+    const toggleDrawer = (newOpen: boolean, resolutionId: string) => async () => {
+        setIsCommentDrawerOpen(newOpen); // Open or close the drawer
 
-    try {
-        console.log("Fetching data for resolution ID:", resolutionId);
+        if (!newOpen) return; // If we're closing the drawer, do nothing
 
-        const fetchedData = await fetchResolutionById(resolutionId); // Fetch the resolution data by ID
-        console.log(fetchedData);
-        console.log(fetchedData.resolution.comments);
-        
-        console.log(comments);
-        // Assuming the fetched data contains a "comments" field
-        
+        try {
+            console.log("Fetching data for resolution ID:", resolutionId);
+
+            const fetchedData = await fetchResolutionById(resolutionId); // Fetch the resolution data by ID
+            console.log(fetchedData);
+            console.log(fetchedData.resolution.comments);
+
+            console.log(comments);
+            // Assuming the fetched data contains a "comments" field
+
             setComments(fetchedData.resolution.comments);// Set comments from fetched data
-       
-    } catch (error) {
-        console.error("Error fetching resolution data:", error); // Log error if API fails
-    }
-};
+
+        } catch (error) {
+            console.error("Error fetching resolution data:", error); // Log error if API fails
+        }
+    };
+
+    const handleLikeResolution = async () => {
+        await likeResolution(r_id);
+    };
 
     return (
         <Card sx={{ display: 'flex', flexDirection: 'column', backgroundColor: '#242936', color: '#f5f5f5', position: 'relative' }}>
@@ -67,7 +71,7 @@ const ResolutionCard: React.FC<CartProps> = ({ ideaTitle, ideaDescription, likeC
 
             <CardActions>
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <IconButton onClick={() => setLiked(!liked)} sx={{ color: liked ? 'primary.main' : '#fff' }}>
+                    <IconButton onClick={() => handleLikeResolution()} sx={{ color: liked ? 'primary.main' : '#fff' }}>
                         <ThumbUpIcon />
                     </IconButton>
                     <Typography>{likeCount}</Typography>
@@ -90,19 +94,19 @@ const ResolutionCard: React.FC<CartProps> = ({ ideaTitle, ideaDescription, likeC
             </Box>
 
             {isCommentDrawerOpen &&
-            <CommentDrawer
-                isCommentDrawerOpen={isCommentDrawerOpen}
-                setIsCommentDrawerOpen={setIsCommentDrawerOpen}
-                name={ideaTitle}
-                resolution={ideaDescription}
-                likeCount={likeCount}
-                commentCount={commentCount}
-                createdAt={createdAt}
-                tags={tags}
-                r_id={r_id}
-                comments={comments}
-                user_id={user_id}
-            />
+                <CommentDrawer
+                    isCommentDrawerOpen={isCommentDrawerOpen}
+                    setIsCommentDrawerOpen={setIsCommentDrawerOpen}
+                    name={ideaTitle}
+                    resolution={ideaDescription}
+                    likeCount={likeCount}
+                    commentCount={commentCount}
+                    createdAt={createdAt}
+                    tags={tags}
+                    r_id={r_id}
+                    comments={comments}
+                    user_id={user_id}
+                />
             }
         </Card>
     );

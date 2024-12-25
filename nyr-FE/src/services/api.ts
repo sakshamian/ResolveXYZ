@@ -111,3 +111,51 @@ export const addComment = async (r_id: string, user_id: string, comment: string)
         throw error;
     }
 };
+
+export const updateProfile = async (name: string) => {
+    const token = localStorage.getItem("token");
+    const reqData = {
+        name
+    };
+    try {
+        const response = await fetch(`${API_BASE_URL}/profile`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(reqData)
+        });
+        if (!response.ok) {
+            throw new Error("Failed to update profile");
+        }
+        return await response.json();
+    } catch (error) {
+        console.error("API Error:", error);
+        throw error;
+    }
+};
+
+export const likeResolution = async (r_id: string) => {
+    const token = localStorage.getItem("token");
+    const reqData = {
+        r_id
+    };
+    try {
+        const response = await fetch(`${API_BASE_URL}/resolution/likes`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(reqData)
+        });
+        if (!response.ok) {
+            throw new Error("Failed to like resolution");
+        }
+        return await response.json();
+    } catch (error) {
+        console.error("API Error:", error);
+        throw error;
+    }
+};

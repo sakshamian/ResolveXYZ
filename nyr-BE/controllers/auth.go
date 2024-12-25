@@ -123,8 +123,10 @@ func GoogleLoginLatest(c *gin.Context) {
 	image := userInfo["picture"].(string)
 
 	collection := db.GetCollection("users")
+	var firstlogin bool
 	var existingUser models.User
 	err = collection.FindOne(context.Background(), bson.M{"email": email}).Decode(&existingUser)
+	firstlogin = false
 	if err != nil {
 		// Create a new user if not found
 		newUser := models.User{
@@ -140,6 +142,7 @@ func GoogleLoginLatest(c *gin.Context) {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user"})
 			return
 		}
+		firstlogin = true
 		existingUser = newUser
 	}
 
@@ -153,5 +156,5 @@ func GoogleLoginLatest(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Login successful", "token": tokenString, "user": existingUser})
+	c.JSON(http.StatusOK, gin.H{"message": "Login successful", "token": tokenString, "user": existingUser, "firstlogin": firstlogin})
 }

@@ -72,13 +72,17 @@ func PostsMiddleware() gin.HandlerFunc {
 		// Get the token from the Authorization header
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {
+			c.Set("user_id", "")
 			c.Next()
+			return
 		}
 
 		// Token format is "Bearer <token>"
 		tokenString := strings.Split(authHeader, " ")
 		if len(tokenString) != 2 || tokenString[0] != "Bearer" {
+			c.Set("user_id", "") // Invalid format, continue without user
 			c.Next()
+			return
 		}
 
 		// Parse the JWT token
@@ -90,18 +94,18 @@ func PostsMiddleware() gin.HandlerFunc {
 			return jwtKey, nil
 		})
 
-		// Handle any parsing error or invalid token
+		// If there is an error or the token is invalid, set user_id as nil and continue
 		if err != nil || !token.Valid {
+			c.Set("user_id", "") // Token is invalid, continue without user
 			c.Next()
+			return
 		}
 
-		// Extract claims (you can use these in your handlers)
+		// If the token is valid, extract the claims and set user_id in the context
 		if claims, ok := token.Claims.(*Claims); ok && token.Valid {
-			c.Set("user_id", claims.UserId)
+			c.Set("user_id", claims.UserId) // Set user_id from claims
 		} else {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token claims"})
-			c.Abort()
-			return
+			c.Set("user_id", "") // If claims are invalid, set user_id as nil
 		}
 
 		// Proceed to the next handler
