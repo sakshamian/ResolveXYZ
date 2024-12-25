@@ -5,8 +5,8 @@ import CommentIcon from '@mui/icons-material/Comment';
 import { fetchResolutionById, likeResolution } from '../../services/api';
 import { convertTimeToDaysAgo } from '../../utils/utils';
 import CommentDrawer from '../CommentDrawer/CommentDrawer';  // Import the CommentDrawer component
-
-
+import { useAuth } from '../../Context/AuthContext';
+import RedirectToLoginModal from '../Modal/RedirectToLoginModal';
 
 interface CartProps {
     ideaTitle: string;
@@ -38,6 +38,9 @@ const ResolutionCard: React.FC<CartProps> = ({ ideaTitle, ideaDescription, likeC
 
     const [isCommentDrawerOpen, setIsCommentDrawerOpen] = useState<boolean>(false);
     const [comments, setComments] = useState<Comment[]>([]);
+    const [isRedirectLoginModalOpen, setRedirectLoginModalOpen] = useState(false);
+
+    const user = useAuth();
 
     // Toggle the drawer open or close
     const toggleDrawer = (newOpen: boolean, resolutionId: string) => async () => {
@@ -59,6 +62,9 @@ const ResolutionCard: React.FC<CartProps> = ({ ideaTitle, ideaDescription, likeC
     };
 
     const handleLikeResolution = async () => {
+        if (!user) {
+            setRedirectLoginModalOpen(true);
+        }
         await likeResolution(r_id);
     };
 
@@ -116,7 +122,6 @@ const ResolutionCard: React.FC<CartProps> = ({ ideaTitle, ideaDescription, likeC
                 }}>
                     <Box sx={{
                         display: 'flex',
-                        width: '100%',
                     }}>
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
                             <IconButton onClick={() => handleLikeResolution()} sx={{ color: hasLiked ? 'primary.main' : '#fff' }}>
@@ -150,10 +155,14 @@ const ResolutionCard: React.FC<CartProps> = ({ ideaTitle, ideaDescription, likeC
                     tags={tags}
                     r_id={r_id}
                     comments={comments}
-                    user_id={user_id}
                     hasLiked={hasLiked}
                 />
             }
+            <RedirectToLoginModal
+                open={isRedirectLoginModalOpen}
+                onClose={() => setRedirectLoginModalOpen(false)}
+                heading="Please login to add resolutions!"
+            />
         </Card >
     );
 };

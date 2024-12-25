@@ -85,12 +85,11 @@ export const fetchResolutionById = async (r_id: string) => {
     }
 };
 
-export const addComment = async (r_id: string, user_id: string, comment: string) => {
+export const addComment = async (r_id: string, comment: string) => {
     const token = localStorage.getItem("token");
     const commentData = {
         r_id,
-        comment: comment,
-        user_id,
+        comment: comment
     };
     console.log(commentData)
     try {

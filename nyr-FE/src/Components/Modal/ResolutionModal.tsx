@@ -54,8 +54,12 @@ const ResolutionModal: React.FC<ResolutionModalProps> = ({ open, onClose, onSubm
     };
 
     // Handle tag removal (via the cross icon)
-    const handleRemoveTag = (tag: string) => {
-        setSelectedTags(selectedTags.filter((t) => t !== tag));
+    const handleRemoveTag = (tagToDelete: string) => (event: React.MouseEvent) => {
+        console.log(tagToDelete, "here")
+        event.preventDefault();
+        event.stopPropagation();
+        setSelectedTags((tags) => tags.filter((tag) => tag !== tagToDelete));
+        setTagLimitReached(false);
     };
 
     // Handle form submission
@@ -113,7 +117,10 @@ const ResolutionModal: React.FC<ResolutionModalProps> = ({ open, onClose, onSubm
                                     <Chip
                                         key={tag}
                                         label={tag}
-                                        onDelete={() => handleRemoveTag(tag)}
+                                        onDelete={handleRemoveTag(tag)}
+                                        onMouseDown={(event) => {
+                                            event.stopPropagation();
+                                        }}
                                         sx={{
                                             borderColor: tagObj?.color,
                                             borderWidth: 2,
@@ -158,6 +165,7 @@ const ResolutionModal: React.FC<ResolutionModalProps> = ({ open, onClose, onSubm
                             py: 0.5,
                         }}
                         onClick={handleSubmit}
+                        disabled={description.trim() === ''}
                     >
                         Post
                     </Button>
