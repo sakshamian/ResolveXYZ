@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Dark Background -->
+  <rect width="32" height="32" rx="6" fill="#1a1a1a"/>
+  
+  <!-- Cleaner R -->
+  <path 
+    d="M8 8 L8 24 M8 8 L16 8 Q20 8 20 12 L20 12 Q20 16 16 16 L8 16 M16 16 L20 24" 
+    stroke="#e6e6e6" 
+    stroke-width="3" 
+    stroke-linecap="round" 
+    stroke-linejoin="round"
+    fill="none"
+  />
+  
+  <!-- X -->
+  <path 
+    d="M22 12 L26 20 M26 12 L22 20" 
+    stroke="#e6e6e6" 
+    stroke-width="3" 
+    stroke-linecap="round"
+  />
+</svg>

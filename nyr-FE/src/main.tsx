@@ -11,6 +11,8 @@ const theme = createTheme({
     MuiMenuItem: {
       styleOverrides: {
         root: {
+          paddingTop: '3px',
+          paddingBottom: '3px',
           fontFamily: 'Comic Neue, sans-serif',
         },
       },
