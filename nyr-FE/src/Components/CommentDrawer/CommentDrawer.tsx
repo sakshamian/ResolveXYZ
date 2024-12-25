@@ -4,7 +4,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import { CardContent, CardActions, Typography, IconButton, Box, Card, Drawer, List, Divider, ListItem, ListItemAvatar, ListItemText, Avatar, Button, TextField, Chip } from '@mui/material';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import CommentIcon from '@mui/icons-material/Comment';
-import { addComment, fetchResolutionById, likeResolution } from '../../services/api';
+import { addComment, likeResolution } from '../../services/api';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import { convertTimeToDaysAgo } from '../../utils/utils';
 
@@ -26,17 +26,17 @@ interface UserDetail {
     user_id: string;
 }
 interface Comment {
-    _id: string; // Unique ID for the comment
-    comment: string; // The comment text
-    created_at: string; // Timestamp of comment creation
-    r_id: string; // Related resolution ID
-    updated_at: string; // Timestamp of the last update
-    user_detail: UserDetail; // Name of the user who wrote the comment
+    _id: string;
+    comment: string;
+    created_at: string;
+    r_id: string;
+    updated_at: string;
+    user_detail: UserDetail;
 }
 
 interface CommentDrawerProps {
     isCommentDrawerOpen: boolean;
-    setIsCommentDrawerOpen: React.Dispatch<React.SetStateAction<boolean>>;  // Function to close the drawer
+    setIsCommentDrawerOpen: React.Dispatch<React.SetStateAction<boolean>>;
     name: string;
     resolution: string;
     likeCount: number;
@@ -44,10 +44,11 @@ interface CommentDrawerProps {
     createdAt: string;
     tags: string[];
     r_id: string;
-    comments: Comment[]; // Array of Comment objects
+    comments: Comment[];
     user_id: string;
     hasLiked: boolean;
 }
+
 const CommentDrawer: React.FC<CommentDrawerProps> = ({
     isCommentDrawerOpen,
     setIsCommentDrawerOpen,
@@ -63,9 +64,8 @@ const CommentDrawer: React.FC<CommentDrawerProps> = ({
     hasLiked,
 }) => {
 
-    // console.log("comments:",comments)
     const [newComment, setNewComment] = useState("");
-    const [loading, setLoading] = useState(false); // Loading state
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string>('');
 
     const handleAddComment = async () => {
@@ -73,35 +73,28 @@ const CommentDrawer: React.FC<CommentDrawerProps> = ({
             return; // Do nothing if the comment is empty
         }
 
-        setLoading(true); // Set loading state to true
-        setError(''); // Clear any previous error
-        console.log("at drawer", newComment)
+        setLoading(true);
+        setError('');
         try {
-            // Call the addComment API function
             const response = await addComment(r_id, user_id, newComment);
-            console.log('New comment added:', response);
-            // Assuming the response contains the updated list of comments, you can update the state
-            // You can directly append the new comment to the existing comments list if needed
-            setNewComment(''); // Clear the comment input field after submission
-
+            setNewComment('');
         } catch (err) {
-            console.error('Error adding comment:', err);
             setError('Failed to add comment. Please try again later.');
         } finally {
-            setLoading(false); // Reset loading state after the request is completed
+            setLoading(false);
         }
     };
 
     const handleLikeResolution = async () => {
-        setLoading(true); // Start loading
+        setLoading(true);
         await likeResolution(r_id);
     };
-    console.log("comments", comments)
 
     const getTagColor = (tagName: string): string | undefined => {
         const tag = availableTags.find(t => t.tag === tagName);
-        return tag ? tag.color : undefined; // Returns color or undefined if tag not found
-      };
+        return tag ? tag.color : undefined;
+    };
+
     return (
         <Drawer
             anchor="right"
@@ -109,17 +102,20 @@ const CommentDrawer: React.FC<CommentDrawerProps> = ({
             onClose={() => setIsCommentDrawerOpen(false)}
             sx={{
                 "& .MuiDrawer-paper": {
-                    width: "40vw", // Set width to 50% of the viewport
-                    maxWidth: "50vw", // Ensure it doesn't exceed 50vw
+                    width: { xs: "100vw", sm: "60vw", md: "50vw" }, // Responsive width based on screen size
+                    maxWidth: "90vw", 
+                    '@media (max-width: 900px)': {
+                        width: '100%',  // Full width for screens <= 900px
+                    },
                 },
             }}
             PaperProps={{
                 sx: {
                     backgroundColor: "#242936",
-                    color: "#FFFFFF", // Text color for contrast
+                    color: "#FFFFFF",
+                    padding: 2,
                 },
-            }
-            }
+            }}
         >
             <Box display="flex" justifyContent="space-between" alignItems="center" p={2}>
                 <Typography variant="h6">Comments</Typography>
@@ -127,40 +123,51 @@ const CommentDrawer: React.FC<CommentDrawerProps> = ({
                     <CloseIcon />
                 </IconButton>
             </Box>
+
             <Divider sx={{ borderColor: "#3A3F47" }} />
+
+            {/* User Details */}
             <Box sx={{ display: "flex", flexDirection: "row", alignItems: "flex-start", p: 2 }}>
-                {/* Avatar */}
                 <Avatar
                     src="/path/to/avatar.jpg"
                     alt={name}
                     sx={{
-                        bgcolor: "#FF4081", // Background color for the avatar
-                        color: "#fff", // Text color
-                        marginRight: 2, // Spacing between avatar and text column
+                        bgcolor: "#FF4081",
+                        color: "#fff",
+                        marginRight: 2,
                     }}
                 >
                     {name.charAt(0).toUpperCase()}
                 </Avatar>
 
-                {/* Name and Resolution */}
                 <Box sx={{ display: "flex", flexDirection: "column", flex: 1 }}>
-                    {/* Name */}
-                    <Typography variant="body1" fontWeight="bold" color="#FFFFFF" fontSize="16px">
-                        {name}
-                    </Typography>
-                    {/* Resolution */}
+                    <Box sx={{display:"flex", alignItems:"center", justifyContent:"space-between"}}>
+                        <Typography variant="body1" fontWeight="bold" color="#FFFFFF" fontSize="16px">
+                            {name}
+                        </Typography>
+                        <Typography
+                            variant="body2"
+                            color="#B0BEC5"
+                            fontSize="12px"
+                        >
+                            {convertTimeToDaysAgo(createdAt)}
+                        </Typography>
+                    </Box>
+
                     <Typography variant="body2" color="#B0BEC5" mt={0.5} fontSize="18px">
                         {resolution}
                     </Typography>
                 </Box>
             </Box>
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '10px', p:2 }}>
+
+            {/* Tags */}
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '10px', p: 2 }}>
                 {tags.map((tag, index) => (
                     <Chip
                         key={index}
                         label={tag}
                         sx={{
-                            borderColor: "#242936", // Green border color for example
+                            borderColor: "#242936",
                             borderWidth: 1,
                             borderStyle: 'solid',
                             backgroundColor: '#242936',
@@ -171,8 +178,8 @@ const CommentDrawer: React.FC<CommentDrawerProps> = ({
             </Box>
 
             {/* Likes and Comments */}
-            <Box display="flex" alignItems="center" justifyContent="" gap={"2vw"} p={2} >
-                <Box display="flex" alignItems="center" onClick={() => handleLikeResolution()}>
+            <Box display="flex" alignItems="center" justifyContent="space-between" p={2}>
+                <Box display="flex" alignItems="center" onClick={handleLikeResolution}>
                     {hasLiked ? (
                         <FavoriteIcon sx={{ marginRight: 1, color: "#E03673" }} />
                     ) : (
@@ -182,16 +189,9 @@ const CommentDrawer: React.FC<CommentDrawerProps> = ({
                 </Box>
                 <Box display="flex" alignItems="center">
                     <CommentIcon sx={{ marginRight: 1, color: "#2196F3" }} />
-                    <Typography variant="body2" fontSize="18px">{commentCount} </Typography>
+                    <Typography variant="body2" fontSize="18px">{commentCount}</Typography>
                 </Box>
             </Box>
-
-            {/* User Picture and Name */}
-
-
-
-
-            <Divider sx={{ borderColor: "#3A3F47" }} />
 
             {/* Comment Box */}
             <Box p={2}>
@@ -216,8 +216,9 @@ const CommentDrawer: React.FC<CommentDrawerProps> = ({
                     fullWidth
                     sx={{ marginTop: 1, backgroundColor: "#2196F3", color: "#fff", fontWeight: 600 }}
                     onClick={handleAddComment}
+                    disabled={loading}
                 >
-                    Post Comment
+                    {loading ? "Posting..." : "Post Comment"}
                 </Button>
             </Box>
 
@@ -232,9 +233,8 @@ const CommentDrawer: React.FC<CommentDrawerProps> = ({
                                 src="/path/to/avatar.jpg"
                                 alt={comment.user_detail.name}
                                 sx={{
-                                    bgcolor: "#FF4081", // Background color for the avatar
-                                    color: "#fff", // Text color
-
+                                    bgcolor: "#FF4081",
+                                    color: "#fff",
                                 }}
                             >
                                 {comment.user_detail.name.charAt(0).toUpperCase()}
@@ -242,7 +242,7 @@ const CommentDrawer: React.FC<CommentDrawerProps> = ({
                         </ListItemAvatar>
                         <ListItemText
                             primary={
-                                <Box display="flex" alignItems="center" justifyContent="">
+                                <Box display="flex" alignItems="center">
                                     <Typography
                                         variant="body1"
                                         fontWeight="bold"
@@ -276,8 +276,8 @@ const CommentDrawer: React.FC<CommentDrawerProps> = ({
                 ))}
             </List>
 
-        </ Drawer >
-    )
-}
+        </Drawer>
+    );
+};
 
-export default CommentDrawer
+export default CommentDrawer;
