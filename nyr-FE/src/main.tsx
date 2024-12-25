@@ -15,6 +15,13 @@ const theme = createTheme({
         },
       },
     },
+    MuiTypography: {
+      styleOverrides: {
+        root: {
+          fontFamily: 'Comic Neue, sans-serif',
+        },
+      },
+    },
     MuiOutlinedInput: {
       styleOverrides: {
         input: {
@@ -27,6 +34,22 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           background: '#181c23', // Set custom background color for AppBar
+        },
+      },
+    },
+    MuiInputLabel: {
+      styleOverrides: {
+        root: {
+          fontFamily: 'Comic Neue, sans-serif',
+        },
+      },
+    },
+    MuiInputBase: {
+      styleOverrides: {
+        input: {
+          "&::placeholder": {
+            fontFamily: 'Comic Neue, sans-serif',
+          },
         },
       },
     },
