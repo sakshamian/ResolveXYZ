@@ -7,6 +7,7 @@ import {
     Select,
     MenuItem,
     Chip,
+    InputLabel,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 
@@ -20,14 +21,18 @@ interface ResolutionModalProps {
     }) => void;
 }
 
-const availableTags = ['#Health', '#Education', '#Career', '#Personal', '#Fitness'];
+const availableTags = ['Productivity', 'Health', 'Education', 'Career', 'Personal', 'Fitness'];
 
 const ResolutionModal: React.FC<ResolutionModalProps> = ({ open, onClose, onSubmit }) => {
     const [description, setDescription] = useState('');
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
     const handleTagSelect = (event: React.ChangeEvent<{ value: unknown }>) => {
-        setSelectedTags(event.target.value as string[]);
+        const value = event.target.value as string[];
+
+        if (value.length <= 3) {
+            setSelectedTags(value);
+        }
     };
 
     const handleRemoveTag = (tag: string) => {
@@ -72,17 +77,29 @@ const ResolutionModal: React.FC<ResolutionModalProps> = ({ open, onClose, onSubm
                 </Box>
 
                 {/* Text Area for Resolution Description */}
+                <InputLabel sx={{ mt: 3 }}>
+                    Resolution
+                </InputLabel>
                 <TextField
                     fullWidth
-                    placeholder="Resolution Description"
+                    placeholder="Write here..."
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    sx={{ mt: 5 }}
+                    sx={{
+                        // mt: 5,
+                        '& .MuiInputBase-root': {
+                            paddingTop: '0px', // Adjust padding here
+                        },
+                    }}
                     multiline
-                    rows={4}
+                    rows={3}
+
                 />
 
                 {/* Multi-select Dropdown for Tags */}
+                <InputLabel sx={{ mt: 2 }}>
+                    Select tags(max 3)
+                </InputLabel>
                 <Select
                     fullWidth
                     multiple
@@ -95,7 +112,6 @@ const ResolutionModal: React.FC<ResolutionModalProps> = ({ open, onClose, onSubm
                             ))}
                         </Box>
                     )}
-                    sx={{ mt: 2 }}
                 >
                     {availableTags.map((tag) => (
                         <MenuItem key={tag} value={tag}>
@@ -103,7 +119,7 @@ const ResolutionModal: React.FC<ResolutionModalProps> = ({ open, onClose, onSubm
                         </MenuItem>
                     ))}
                 </Select>
-                <Box sx={{ mt: 6, display: 'flex', gap: 3, justifyContent: 'flex-end' }}>
+                <Box sx={{ mt: 1, display: 'flex', gap: 3, justifyContent: 'flex-end' }}>
                     <Button
                         variant="contained"
                         sx={{

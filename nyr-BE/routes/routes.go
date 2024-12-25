@@ -32,4 +32,11 @@ func InitRoutes(router *gin.Engine) {
 		resolutionRoutes.POST("/likes", controllers.ToggleLikeResolution)
 		resolutionRoutes.POST("/comments", controllers.CreateComment)
 	}
+
+	// user routes
+	profileRoutes := router.Group("profile")
+	{
+		profileRoutes.Use(middleware.AuthMiddleware())
+		profileRoutes.PUT("", controllers.UpdateUser)
+	}
 }
