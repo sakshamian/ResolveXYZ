@@ -22,7 +22,10 @@ const UpdateProfileModal: React.FC<UpdateProfileModalProps> = ({ open, onClose, 
 
     const handleUpdateProfile = async () => {
         const res = await updateProfile(username);
-        if (res) onClose();
+        if (res) {
+            onClose();
+            window.location.reload();
+        }
     };
 
     return (

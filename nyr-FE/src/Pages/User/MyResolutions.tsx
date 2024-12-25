@@ -47,8 +47,8 @@ const MyResolutions = () => {
                         return (
                             <Box
                                 key={ind}
-                                flex="1 1 calc(33.333% - 16px)" // This ensures three cards per row with space between them
-                                minWidth="300px" // Minimum width to avoid items being too small
+                                flex="1 1 calc(33.333% - 16px)"
+                                minWidth="300px"
                             >
                                 <ResolutionCard
                                     ideaTitle={card.user_name || "Unknown User"}
