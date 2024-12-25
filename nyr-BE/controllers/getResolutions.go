@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"net/http"
 	"nyr/db"
@@ -14,6 +13,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+// GetResolutions fetches the resolutions with like count, comment count, and user information
 func GetResolutions(c *gin.Context) {
 	// Check if the user is logged in
 	isLoggedIn := false
@@ -119,7 +119,6 @@ func GetResolutions(c *gin.Context) {
 	// If user is logged in, check if user has liked any resolution
 	for i := range resolutions {
 		rID, ok := resolutions[i]["_id"].(primitive.ObjectID)
-		fmt.Println("r_id:", rID)
 		if ok {
 			// Query the "likes" collection to check if the logged-in user has liked this resolution
 			likeFilter := bson.M{
@@ -133,7 +132,7 @@ func GetResolutions(c *gin.Context) {
 			if err != nil {
 				// If no like document is found, the user has not liked this resolution
 				if err == mongo.ErrNoDocuments {
-					resolutions[i]["isLiked"] = false
+					resolutions[i]["hasLiked"] = false
 				} else {
 					log.Printf("Error checking user like: %v", err)
 					c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to check user likes"})
@@ -141,7 +140,7 @@ func GetResolutions(c *gin.Context) {
 				}
 			} else {
 				// If a like document is found, the user has liked this resolution
-				resolutions[i]["isLiked"] = true
+				resolutions[i]["hasLiked"] = true
 			}
 		}
 	}

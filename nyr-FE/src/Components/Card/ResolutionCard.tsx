@@ -17,24 +17,28 @@ interface CartProps {
     tags: string[];
     r_id: string;
     user_id: string;
+    hasLiked:boolean;
 }
 
-const ResolutionCard: React.FC<CartProps> = ({ ideaTitle, ideaDescription, likeCount, commentCount, createdAt, tags, r_id, user_id }) => {
+const ResolutionCard: React.FC<CartProps> = ({ ideaTitle, ideaDescription, likeCount, commentCount, createdAt, tags, r_id, user_id,hasLiked }) => {
 
+    interface UserDetail{
+        name:string;
+        user_id:string;
+    }
     interface Comment {
         _id: string; // Unique ID for the comment
         comment: string; // The comment text
         created_at: string; // Timestamp of comment creation
         r_id: string; // Related resolution ID
         updated_at: string; // Timestamp of the last update
-        user_id: string; // ID of the user who wrote the comment
-        user_name: string; // Name of the user who wrote the comment
+        user_detail: UserDetail; // Name of the user who wrote the comment
     }
-
-    const [liked, setLiked] = useState<boolean>(false);
+    
+  
     const [isCommentDrawerOpen, setIsCommentDrawerOpen] = useState<boolean>(false);
     const [comments, setComments] = useState<Comment[]>([]);
-
+    
     // Toggle the drawer open or close
     const toggleDrawer = (newOpen: boolean, resolutionId: string) => async () => {
         setIsCommentDrawerOpen(newOpen); // Open or close the drawer
@@ -43,16 +47,12 @@ const ResolutionCard: React.FC<CartProps> = ({ ideaTitle, ideaDescription, likeC
 
         try {
             console.log("Fetching data for resolution ID:", resolutionId);
-
             const fetchedData = await fetchResolutionById(resolutionId); // Fetch the resolution data by ID
             console.log(fetchedData);
-            console.log(fetchedData.resolution.comments);
-
+            // console.log(fetchedData.resolution.comments);
             console.log(comments);
             // Assuming the fetched data contains a "comments" field
-
-            setComments(fetchedData.resolution.comments);// Set comments from fetched data
-
+            setComments(fetchedData.data.comments);// Set comments from fetched data
         } catch (error) {
             console.error("Error fetching resolution data:", error); // Log error if API fails
         }
@@ -68,10 +68,9 @@ const ResolutionCard: React.FC<CartProps> = ({ ideaTitle, ideaDescription, likeC
                 <h3>{ideaTitle}</h3>
                 <Box>{ideaDescription}</Box>
             </CardContent>
-
             <CardActions>
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <IconButton onClick={() => handleLikeResolution()} sx={{ color: liked ? 'primary.main' : '#fff' }}>
+                    <IconButton onClick={() => handleLikeResolution()} sx={{ color: hasLiked ? 'primary.main' : '#fff' }}>
                         <ThumbUpIcon />
                     </IconButton>
                     <Typography>{likeCount}</Typography>
@@ -83,7 +82,6 @@ const ResolutionCard: React.FC<CartProps> = ({ ideaTitle, ideaDescription, likeC
                     <Typography>{commentCount}</Typography>
                 </Box>
             </CardActions>
-
             <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
                 {tags.map((tag, idx) => (
                     <Box key={idx} sx={{ display: 'flex', gap: '2px' }}>
@@ -92,7 +90,6 @@ const ResolutionCard: React.FC<CartProps> = ({ ideaTitle, ideaDescription, likeC
                 ))}
                 {convertTimeToDaysAgo(createdAt)}
             </Box>
-
             {isCommentDrawerOpen &&
                 <CommentDrawer
                     isCommentDrawerOpen={isCommentDrawerOpen}
@@ -106,6 +103,7 @@ const ResolutionCard: React.FC<CartProps> = ({ ideaTitle, ideaDescription, likeC
                     r_id={r_id}
                     comments={comments}
                     user_id={user_id}
+                    hasLiked={hasLiked}
                 />
             }
         </Card>

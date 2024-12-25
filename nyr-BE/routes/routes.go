@@ -25,7 +25,7 @@ func InitRoutes(router *gin.Engine) {
 	resolutionRoutes := router.Group("resolution")
 	{
 		resolutionRoutes.GET("", middleware.PostsMiddleware(), controllers.GetResolutions)
-		resolutionRoutes.GET("/:id", middleware.PostsMiddleware(), controllers.GetResolutionById)
+		resolutionRoutes.GET("/:id", middleware.PostsMiddleware(), controllers.GetResolutionByID)
 
 		resolutionRoutes.Use(middleware.AuthMiddleware())
 		resolutionRoutes.POST("", controllers.CreateResolution)
