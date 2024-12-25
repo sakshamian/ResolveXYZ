@@ -8,9 +8,10 @@ import {
     MenuItem,
     Chip,
     InputLabel,
+    FormHelperText,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-
+import { SelectChangeEvent } from '@mui/material/Select';
 
 interface ResolutionModalProps {
     open: boolean;
@@ -21,24 +22,43 @@ interface ResolutionModalProps {
     }) => void;
 }
 
-const availableTags = ['Productivity', 'Health', 'Education', 'Career', 'Personal', 'Fitness'];
+const availableTags = [
+    { tag: 'Productivity', color: '#4CAF50' },
+    { tag: 'Health', color: '#FF6347' },
+    { tag: 'Education', color: '#1E90FF' },
+    { tag: 'Career', color: '#FFD700' },
+    { tag: 'Fitness', color: '#32CD32' },
+    { tag: 'Finance', color: '#FF8C00' },
+    { tag: 'Family', color: '#FF1493' },
+    { tag: 'Happiness', color: '#FFEB3B' },
+    { tag: 'Mindfulness', color: '#B0E0E6' },
+    { tag: 'Technology', color: '#0000FF' },
+];
 
 const ResolutionModal: React.FC<ResolutionModalProps> = ({ open, onClose, onSubmit }) => {
     const [description, setDescription] = useState('');
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
+    const [tagLimitReached, setTagLimitReached] = useState(false);
 
-    const handleTagSelect = (event: React.ChangeEvent<{ value: unknown }>) => {
-        const value = event.target.value as string[];
-
-        if (value.length <= 3) {
-            setSelectedTags(value);
+    // Handle tag selection
+    const handleTagSelect = (event: SelectChangeEvent<string[]>) => {
+        const value = event.target.value;
+        if (Array.isArray(value)) {
+            if (value.length <= 3) {
+                setSelectedTags(value);
+                setTagLimitReached(false);
+            } else {
+                setTagLimitReached(true);  // Enable tag limit error message
+            }
         }
     };
 
+    // Handle tag removal (via the cross icon)
     const handleRemoveTag = (tag: string) => {
         setSelectedTags(selectedTags.filter((t) => t !== tag));
     };
 
+    // Handle form submission
     const handleSubmit = () => {
         onSubmit({ resolution: description, tags: selectedTags });
         setDescription('');
@@ -47,11 +67,7 @@ const ResolutionModal: React.FC<ResolutionModalProps> = ({ open, onClose, onSubm
     };
 
     return (
-        <Modal
-            open={open}
-            onClose={onClose}
-            sx={{ color: "#f2f2f2" }}
-        >
+        <Modal open={open} onClose={onClose} sx={{ color: "#f2f2f2" }}>
             <Box
                 sx={{
                     position: 'absolute',
@@ -65,41 +81,25 @@ const ResolutionModal: React.FC<ResolutionModalProps> = ({ open, onClose, onSubm
                     width: 400,
                 }}
             >
-                <Box sx={{
-                    fontSize: "18px",
-                    fontWeight: 400,
-                    mb: 2,
-                    display: "flex",
-                    justifyContent: "space-between"
-                }}>
+                <Box sx={{ fontSize: "18px", fontWeight: 400, mb: 2, display: "flex", justifyContent: "space-between" }}>
                     <h3>New Resolution</h3>
                     <CloseIcon onClick={onClose} style={{ cursor: 'pointer' }} />
                 </Box>
 
                 {/* Text Area for Resolution Description */}
-                <InputLabel sx={{ mt: 3 }}>
-                    Resolution
-                </InputLabel>
+                <InputLabel sx={{ mt: 3 }}>Resolution</InputLabel>
                 <TextField
                     fullWidth
                     placeholder="Write here..."
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    sx={{
-                        // mt: 5,
-                        '& .MuiInputBase-root': {
-                            paddingTop: '0px', // Adjust padding here
-                        },
-                    }}
+                    sx={{ '& .MuiInputBase-root': { paddingTop: '0px' } }}
                     multiline
                     rows={3}
-
                 />
 
                 {/* Multi-select Dropdown for Tags */}
-                <InputLabel sx={{ mt: 2 }}>
-                    Select tags(max 3)
-                </InputLabel>
+                <InputLabel sx={{ mt: 2 }}>Select tags (max 3)</InputLabel>
                 <Select
                     fullWidth
                     multiple
@@ -107,18 +107,46 @@ const ResolutionModal: React.FC<ResolutionModalProps> = ({ open, onClose, onSubm
                     onChange={handleTagSelect}
                     renderValue={(selected) => (
                         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                            {(selected as string[]).map((tag) => (
-                                <Chip key={tag} label={tag} onDelete={() => handleRemoveTag(tag)} />
-                            ))}
+                            {(selected as string[]).map((tag) => {
+                                const tagObj = availableTags.find(t => t.tag === tag);
+                                return (
+                                    <Chip
+                                        key={tag}
+                                        label={tag}
+                                        onDelete={() => handleRemoveTag(tag)}
+                                        sx={{
+                                            borderColor: tagObj?.color,
+                                            borderWidth: 2,
+                                            borderStyle: 'solid',
+                                            backgroundColor: 'transparent',
+                                            color: tagObj?.color,
+                                            borderRadius: '16px',
+                                            padding: '5px 10px',
+                                            '&:hover': {
+                                                borderColor: tagObj?.color,
+                                            },
+                                        }}
+                                    />
+                                );
+                            })}
                         </Box>
                     )}
                 >
-                    {availableTags.map((tag) => (
-                        <MenuItem key={tag} value={tag}>
-                            {tag}
+                    {availableTags.map((availableTag) => (
+                        <MenuItem key={availableTag.tag} value={availableTag.tag}>
+                            {availableTag.tag}
                         </MenuItem>
                     ))}
                 </Select>
+
+                {/* Display Error Message if Limit Reached */}
+                {tagLimitReached && (
+                    <FormHelperText error sx={{ mt: 1 }}>
+                        You can select up to 3 tags only.
+                    </FormHelperText>
+                )}
+
+                {/* Submit Button */}
                 <Box sx={{ mt: 1, display: 'flex', gap: 3, justifyContent: 'flex-end' }}>
                     <Button
                         variant="contained"
@@ -127,7 +155,7 @@ const ResolutionModal: React.FC<ResolutionModalProps> = ({ open, onClose, onSubm
                             color: "black",
                             background: "#f2f2f2",
                             px: 3,
-                            py: 0.5
+                            py: 0.5,
                         }}
                         onClick={handleSubmit}
                     >
@@ -135,7 +163,7 @@ const ResolutionModal: React.FC<ResolutionModalProps> = ({ open, onClose, onSubm
                     </Button>
                 </Box>
             </Box>
-        </Modal >
+        </Modal>
     );
 };
 
