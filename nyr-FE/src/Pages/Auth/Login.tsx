@@ -7,7 +7,8 @@ import UpdateProfileModal from '../../Components/Modal/UpdateProfileModal';
 
 const SignIn: React.FC = () => {
     const [updateProfileModalOpen, setUpdateProfileModalOpen] = useState(false);
-    const { setToken } = useAuth();
+    const [defaultUserName, setDefaultUsername] = useState('')
+    const { setToken, setUser } = useAuth();
     const navigate = useNavigate();
 
     const handleLoginSuccess = async (response: any) => {
@@ -27,15 +28,9 @@ const SignIn: React.FC = () => {
                     const data = await res.json();
                     localStorage.setItem('token', data.token);
                     setToken(data.token);
-                    if (data.firstLogin) {
-                        <UpdateProfileModal open={updateProfileModalOpen}
-                            onClose={() => {
-                                setUpdateProfileModalOpen(false);
-                                navigate('/');
-                            }}
-                            defaultName={data.user.name}
-                            heading="Enter your name"
-                        />
+                    setDefaultUsername(data.user.name);
+                    if (data.firstlogin) {
+                        setUpdateProfileModalOpen(true);
                     }
                     else navigate('/');
                 } else {
@@ -51,10 +46,6 @@ const SignIn: React.FC = () => {
 
     const handleLoginFailure = (error: any) => {
         console.error('Login Failed:', error);
-    };
-
-    const toggleAuthMethod = () => {
-        navigate('/sign-up');
     };
 
     useEffect(() => {
@@ -82,6 +73,14 @@ const SignIn: React.FC = () => {
                     />
                 </div>
             </div>
+            <UpdateProfileModal open={updateProfileModalOpen}
+                onClose={() => {
+                    setUpdateProfileModalOpen(false);
+                    navigate('/');
+                }}
+                defaultName={defaultUserName}
+                heading="Enter your name"
+            />
         </GoogleOAuthProvider>
     );
 };
