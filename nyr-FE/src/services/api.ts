@@ -159,3 +159,22 @@ export const likeResolution = async (r_id: string) => {
         throw error;
     }
 };
+
+export const fetchMyResolutions = async () => {
+    const token = localStorage.getItem("token");
+    try {
+        const response = await fetch(`${API_BASE_URL}/resolution/me`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+        if (!response.ok) {
+            throw new Error("Failed to fetch resolutions");
+        }
+        return await response.json();
+    } catch (error) {
+        console.error("API Error:", error);
+        throw error;
+    }
+};

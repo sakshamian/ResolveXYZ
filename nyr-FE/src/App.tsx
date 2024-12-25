@@ -5,6 +5,7 @@ import { AuthProvider } from './Context/AuthContext'
 import Main from './Pages/Main/Main'
 import ProtectedRoute from './Components/ProtectedRoute/ProtectedRoute'
 import SignIn from './Pages/Auth/Login'
+import MyResolutions from './Pages/User/MyResolutions'
 
 function App() {
   return (
@@ -20,10 +21,11 @@ function App() {
             }
           />
           <Route
-            path="/protected"
+            path="/my-posts"
             element={
               <ProtectedRoute>
-                <Main />
+                <ResponsiveAppBar />
+                <MyResolutions />
               </ProtectedRoute>
             }
           />

@@ -31,6 +31,7 @@ func InitRoutes(router *gin.Engine) {
 		resolutionRoutes.POST("", controllers.CreateResolution)
 		resolutionRoutes.POST("/likes", controllers.ToggleLikeResolution)
 		resolutionRoutes.POST("/comments", controllers.CreateComment)
+		resolutionRoutes.GET("/me", controllers.GetUserResolutions)
 	}
 
 	// user routes
