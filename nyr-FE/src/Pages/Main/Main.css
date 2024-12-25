@@ -1,9 +1,9 @@
 .main-container{
-  margin: 50px auto;
-  max-width: 1200px;
+  margin: 50px;
 }
 
 .card-container {
+  margin-top: 30px;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -22,16 +22,4 @@
 .card p {
   font-size: 1rem;
   line-height: 1.5;
-}
-
-@media (max-width: 1350px) {
-  .card-container {
-    width: 80%;
-  }
-}
-
-@media (max-width: 1260px) {
-  .card-container {
-    justify-content: center;
-  }
 }

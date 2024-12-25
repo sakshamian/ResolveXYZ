@@ -92,7 +92,10 @@ function ResponsiveAppBar() {
                     <MenuItem sx={{ fontSize: 16, fontWeight: 600, cursor: 'default' }}>{user.name}</MenuItem>
                     <MenuItem sx={{ fontSize: 16, fontWeight: 600, cursor: 'default' }}>{user.email}</MenuItem>
                     <Divider />
-                    <MenuItem sx={{ fontSize: 14 }} onClick={handleClose}>
+                    <MenuItem sx={{ fontSize: 14 }} onClick={() => {
+                      setAnchorEl(null);
+                      navigate('/my-posts');
+                    }}>
                       <EventNoteIcon fontSize='small' sx={{ paddingRight: '5px' }} />
                       My resolutions
                     </MenuItem>

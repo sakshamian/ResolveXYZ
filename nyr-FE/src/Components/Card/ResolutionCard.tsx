@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { CardContent, CardActions, Typography, IconButton, Box, Card } from '@mui/material';
+import React, { useState } from 'react';
+import { Typography, IconButton, Box, Card, Avatar } from '@mui/material';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import CommentIcon from '@mui/icons-material/Comment';
 import { fetchResolutionById, likeResolution } from '../../services/api';
@@ -17,14 +17,14 @@ interface CartProps {
     tags: string[];
     r_id: string;
     user_id: string;
-    hasLiked:boolean;
+    hasLiked: boolean;
 }
 
-const ResolutionCard: React.FC<CartProps> = ({ ideaTitle, ideaDescription, likeCount, commentCount, createdAt, tags, r_id, user_id,hasLiked }) => {
+const ResolutionCard: React.FC<CartProps> = ({ ideaTitle, ideaDescription, likeCount, commentCount, createdAt, tags, r_id, user_id, hasLiked }) => {
 
-    interface UserDetail{
-        name:string;
-        user_id:string;
+    interface UserDetail {
+        name: string;
+        user_id: string;
     }
     interface Comment {
         _id: string; // Unique ID for the comment
@@ -34,11 +34,11 @@ const ResolutionCard: React.FC<CartProps> = ({ ideaTitle, ideaDescription, likeC
         updated_at: string; // Timestamp of the last update
         user_detail: UserDetail; // Name of the user who wrote the comment
     }
-    
-  
+
+
     const [isCommentDrawerOpen, setIsCommentDrawerOpen] = useState<boolean>(false);
     const [comments, setComments] = useState<Comment[]>([]);
-    
+
     // Toggle the drawer open or close
     const toggleDrawer = (newOpen: boolean, resolutionId: string) => async () => {
         setIsCommentDrawerOpen(newOpen); // Open or close the drawer
@@ -63,34 +63,82 @@ const ResolutionCard: React.FC<CartProps> = ({ ideaTitle, ideaDescription, likeC
     };
 
     return (
-        <Card sx={{ display: 'flex', flexDirection: 'column', backgroundColor: '#242936', color: '#f5f5f5', position: 'relative' }}>
-            <CardContent>
-                <h3>{ideaTitle}</h3>
-                <Box>{ideaDescription}</Box>
-            </CardContent>
-            <CardActions>
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <IconButton onClick={() => handleLikeResolution()} sx={{ color: hasLiked ? 'primary.main' : '#fff' }}>
-                        <ThumbUpIcon />
-                    </IconButton>
-                    <Typography>{likeCount}</Typography>
+        <Card sx={{ display: 'flex', flexDirection: 'column', backgroundColor: '#242936', color: '#f5f5f5', position: 'relative', height: "250px", p: 2, maxWidth: '400px' }}>
+            <Box sx={{
+                display: 'flex',
+                flexDirection: 'column'
+            }}>
+                <Box sx={{
+                    display: 'flex',
+                    gap: 1,
+                    alignItems: 'center'
+                }}>
+                    <Avatar alt={ideaTitle} src="/path-to-name" sx={{
+                        width: 23,
+                        height: 23,
+                    }} />
+                    <h3>{ideaTitle}</h3>
                 </Box>
-                <Box sx={{ display: 'flex', alignItems: 'center' }} onClick={toggleDrawer(true, r_id)}>
-                    <IconButton sx={{ color: '#fff' }}>
-                        <CommentIcon />
-                    </IconButton>
-                    <Typography>{commentCount}</Typography>
-                </Box>
-            </CardActions>
-            <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                {tags.map((tag, idx) => (
-                    <Box key={idx} sx={{ display: 'flex', gap: '2px' }}>
-                        <div>{tag}</div>
-                    </Box>
-                ))}
-                {convertTimeToDaysAgo(createdAt)}
+                <Typography
+                    variant="body1"
+                    sx={{
+                        height: "140px",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        WebkitBoxOrient: "vertical",
+                        whiteSpace: "normal",
+                        display: "-webkit-box", // Use flex container for ellipsis in multiple lines
+                        WebkitLineClamp: 6,
+                        my: 2,
+                        color: "#f2f2f2"
+                    }}
+                >{ideaDescription}</Typography>
             </Box>
-            {isCommentDrawerOpen &&
+
+            <Box sx={{
+                display: 'flex',
+                justifyContent: 'start',
+                flexDirection: 'column',
+            }}>
+                <Box sx={{ display: 'flex' }}>
+                    {tags.map((tag, idx) => (
+                        <Box key={idx} sx={{ display: 'flex', gap: '2px', fontSize: '12px' }}>
+                            {tag}
+                        </Box>
+                    ))}
+                </Box>
+                <Box sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    width: '100%',
+                    height: '50px'
+                }}>
+                    <Box sx={{
+                        display: 'flex',
+                        width: '100%',
+                    }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                            <IconButton onClick={() => handleLikeResolution()} sx={{ color: hasLiked ? 'primary.main' : '#fff' }}>
+                                <ThumbUpIcon />
+                            </IconButton>
+                            <Typography>{likeCount}</Typography>
+                        </Box>
+                        <Box sx={{ display: 'flex', alignItems: 'center' }} onClick={toggleDrawer(true, r_id)}>
+                            <IconButton sx={{ color: '#fff' }}>
+                                <CommentIcon />
+                            </IconButton>
+                            <Typography>{commentCount}</Typography>
+                        </Box>
+                    </Box>
+                    <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                        {convertTimeToDaysAgo(createdAt)}
+                    </Box>
+                </Box>
+            </Box>
+
+            {
+                isCommentDrawerOpen &&
                 <CommentDrawer
                     isCommentDrawerOpen={isCommentDrawerOpen}
                     setIsCommentDrawerOpen={setIsCommentDrawerOpen}
@@ -106,7 +154,7 @@ const ResolutionCard: React.FC<CartProps> = ({ ideaTitle, ideaDescription, likeC
                     hasLiked={hasLiked}
                 />
             }
-        </Card>
+        </Card >
     );
 };
 

@@ -43,6 +43,7 @@ const Main = () => {
 
     const handleSubmitResolution = (resolution: { resolution: string; tags: string[] }) => {
         postResolutions(resolution);
+        window.location.reload();
     };
 
     const loadCards = async () => {
@@ -72,19 +73,21 @@ const Main = () => {
 
     return (
         <div className="main-container">
-            <Box display="flex" justifyContent="flex-end">
+            <Box display="flex" >
                 <Button
                     variant="contained"
                     sx={{
                         // display
                         textTransform: "none",
                         color: "black",
-                        background: "#fff"
+                        background: "#fff",
+                        fontSize: '16px',
+                        fontWeight: 600
                     }}
                     onClick={handleOpen}
                 >
                     <AddIcon fontSize="small" sx={{ marginRight: "15px" }} />
-                    Add Resolution
+                    ADD RESOLUTION
                 </Button>
             </Box>
             <div className="card-container">
@@ -98,16 +101,19 @@ const Main = () => {
                         </Box>
                     }
                     endMessage={
-                        <Typography variant="body1" align="center" color="textSecondary">
-                            &#128104; You saw all the resolutions.
+                        <Typography sx={{ my: 4 }} variant="body1" align="center" color="textSecondary">
+                            &#128104; That's all folks! You've reached the end.
                         </Typography>
                     }
+                    style={{
+                        padding: '0px'
+                    }}
                 >
                     <Box
                         display="flex"
                         flexWrap="wrap"
                         gap={2}
-                        p={2}
+                        // p={2}
                         justifyContent="space-between"
                     >
                         {cards?.map((card, ind) => {
