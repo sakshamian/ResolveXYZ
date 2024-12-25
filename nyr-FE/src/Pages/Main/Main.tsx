@@ -38,14 +38,13 @@ const Main = () => {
         } else {
             setRedirectLoginModalOpen(true);
         }
-    }
+    };
     const handleClose = () => setIsModalOpen(false);
 
     const handleSubmitResolution = (resolution: { resolution: string; tags: string[] }) => {
         postResolutions(resolution);
         window.location.reload();
     };
-
     const loadCards = async () => {
         try {
             const data = await fetchResolutions(page);
@@ -56,7 +55,6 @@ const Main = () => {
             }
 
             setCards((prevResolutions) => [...prevResolutions, ...data.resolutions]);
-            console.log(data)
             if (data.resolutions.length < 10) {
                 setHasMore(false); // No more items to fetch
             }
@@ -73,11 +71,10 @@ const Main = () => {
 
     return (
         <div className="main-container">
-            <Box display="flex" >
+            <Box display="flex">
                 <Button
                     variant="contained"
                     sx={{
-                        // display
                         textTransform: "none",
                         color: "black",
                         background: "#fff",
@@ -113,13 +110,12 @@ const Main = () => {
                         display="flex"
                         flexWrap="wrap"
                         gap={2}
-                        // p={2}
                         justifyContent="space-between"
                     >
-                        {cards?.map((card, ind) => {
+                        {cards?.map((card) => {
                             return (
                                 <Box
-                                    key={ind}
+                                    key={card._id}
                                     flex="1 1 calc(33.333% - 16px)" // This ensures three cards per row with space between them
                                     minWidth="300px" // Minimum width to avoid items being too small
                                 >
@@ -150,7 +146,7 @@ const Main = () => {
                 onClose={() => setRedirectLoginModalOpen(false)}
                 heading="Please login to add resolutions!"
             />
-        </div >
+        </div>
     );
 };
 
