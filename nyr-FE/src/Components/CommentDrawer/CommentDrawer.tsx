@@ -51,6 +51,7 @@ interface CommentDrawerProps {
     r_id: string;
     comments: Comment[];
     hasLiked: boolean;
+    LikeButton: React.FC<{ className?: string }>;
 }
 
 const CommentDrawer: React.FC<CommentDrawerProps> = ({
@@ -65,6 +66,7 @@ const CommentDrawer: React.FC<CommentDrawerProps> = ({
     r_id,
     comments: initialComments,
     hasLiked: initialHasLiked,
+    LikeButton
 }) => {
 
     const [newComment, setNewComment] = useState("");
@@ -84,6 +86,7 @@ const CommentDrawer: React.FC<CommentDrawerProps> = ({
         }
         if (!user) {
             setRedirectLoginModalOpen(true);
+            return;
         }
         // setLoading(true);
         setError('');
@@ -109,28 +112,6 @@ const CommentDrawer: React.FC<CommentDrawerProps> = ({
         } finally {
             // setLoading(false);
         }
-    };
-
-    const handleLikeResolution = async () => {
-        if (!user) {
-            setRedirectLoginModalOpen(true);
-            return;
-        }
-
-        try {
-            setLocalHasLiked(prev => !prev);
-            setLocalLikeCount(prev => prev + (localHasLiked ? -1 : 1));
-            await likeResolution(r_id);
-        } catch (err) {
-            setLocalHasLiked(prev => !prev);
-            setLocalLikeCount(prev => prev + (localHasLiked ? 1 : -1));
-            console.error(err);
-        }
-    };
-
-    const getTagColor = (tagName: string): string | undefined => {
-        const tag = availableTags.find(t => t.tag === tagName);
-        return tag ? tag.color : undefined;
     };
 
     useEffect(() => {
@@ -238,14 +219,15 @@ const CommentDrawer: React.FC<CommentDrawerProps> = ({
 
             {/* Likes and Comments */}
             <Box display="flex" alignItems="center" gap={2} p={2}>
-                <Box display="flex" alignItems="center" onClick={handleLikeResolution} sx={{ cursor: 'pointer' }}>
+                {/* <Box display="flex" alignItems="center" onClick={handleLikeResolution} sx={{ cursor: 'pointer' }}>
                     {localHasLiked ? (
                         <FavoriteIcon sx={{ marginRight: 1, color: "#E03673" }} />
                     ) : (
                         <FavoriteBorderIcon sx={{ marginRight: 1, color: "#fff" }} />
                     )}
                     <Typography variant="body2" fontSize="18px">{localLikeCount}</Typography>
-                </Box>
+                </Box> */}
+                <LikeButton />
                 <Box display="flex" alignItems="center" sx={{ cursor: 'pointer' }}>
                     <CommentIcon sx={{ marginRight: 1, color: "#2196F3" }} />
                     <Typography variant="body2" fontSize="18px">{localCommentCount}</Typography>
@@ -336,7 +318,7 @@ const CommentDrawer: React.FC<CommentDrawerProps> = ({
             <RedirectToLoginModal
                 open={isRedirectLoginModalOpen}
                 onClose={() => setRedirectLoginModalOpen(false)}
-                heading="Please login to add resolutions!"
+                heading="Please login to share your thoughts!"
             />
 
         </Drawer>

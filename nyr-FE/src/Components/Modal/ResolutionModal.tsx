@@ -69,7 +69,8 @@ const ResolutionModal: React.FC<ResolutionModalProps> = ({ open, onClose, onSubm
                     boxShadow: 24,
                     p: 4,
                     borderRadius: 2,
-                    width: 400,
+                    width: '90%',
+                    maxWidth: 400,
                 }}
             >
                 <Box sx={{ fontSize: "18px", fontWeight: 400, mb: 2, display: "flex", justifyContent: "space-between" }}>
@@ -111,6 +112,9 @@ const ResolutionModal: React.FC<ResolutionModalProps> = ({ open, onClose, onSubm
                                             backgroundColor: ' #242936',
                                             color: '#fff',  // Dark text color for contrast
                                             borderRadius: '16px',
+                                            borderWidth: 1,
+                                            borderStyle: 'solid',
+                                            borderColor: '#ccc', // Default border if not found
                                             padding: '5px ',
                                             '&:hover': {
                                                 borderColor: '#8C8C8C',  // Slightly darker on hover

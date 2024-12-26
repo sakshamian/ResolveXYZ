@@ -52,7 +52,6 @@ func GetResolutions(c *gin.Context) {
 
 	// Query to get resolutions with like count, comment count, and user information
 	cursor, err := resolutionsCollection.Aggregate(context.Background(), []bson.M{
-		// Step 1: Look up the "likes" collection to get the like count for each resolution
 		{
 			"$lookup": bson.M{
 				"from":         "likes", // Join with the "likes" collection
@@ -61,7 +60,6 @@ func GetResolutions(c *gin.Context) {
 				"as":           "likes", // Store the matched likes in a field named "likes"
 			},
 		},
-		// Step 2: Look up the "comments" collection to get the comment count for each resolution
 		{
 			"$lookup": bson.M{
 				"from":         "comments", // Join with the "comments" collection
@@ -70,7 +68,6 @@ func GetResolutions(c *gin.Context) {
 				"as":           "comments", // Store the matched comments in a field named "comments"
 			},
 		},
-		// Step 3: Look up the "users" collection to get the user's name
 		{
 			"$lookup": bson.M{
 				"from":         "users",   // Join with the "users" collection
@@ -79,7 +76,6 @@ func GetResolutions(c *gin.Context) {
 				"as":           "user",    // Store the matched user in a field named "user"
 			},
 		},
-		// Step 4: Project required fields including like count, comment count, tags, and user information
 		{
 			"$project": bson.M{
 				"resolution":    1,                                                      // Include the resolution field
@@ -92,7 +88,11 @@ func GetResolutions(c *gin.Context) {
 				"user_name":     bson.M{"$arrayElemAt": []interface{}{"$user.name", 0}}, // Get the user's name
 			},
 		},
-		// Step 5: Skip and Limit for pagination
+		{
+			"$sort": bson.M{
+				"like_count": -1,
+			},
+		},
 		{
 			"$skip": skip,
 		},

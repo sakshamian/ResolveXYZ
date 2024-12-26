@@ -39,7 +39,7 @@ interface CartProps {
     hasLiked: boolean;
 }
 
-const ResolutionCard: React.FC<CartProps> = ({ ideaTitle, ideaDescription, likeCount, commentCount, createdAt, tags, r_id, user_id, hasLiked }) => {
+const ResolutionCard: React.FC<CartProps> = ({ ideaTitle, ideaDescription, likeCount: initialLikeCount, commentCount, createdAt, tags, r_id, user_id, hasLiked: initialHasLiked }) => {
 
     interface UserDetail {
         name: string;
@@ -54,12 +54,14 @@ const ResolutionCard: React.FC<CartProps> = ({ ideaTitle, ideaDescription, likeC
         user_detail: UserDetail; // Name of the user who wrote the comment
     }
 
+    const { user } = useAuth();
 
     const [isCommentDrawerOpen, setIsCommentDrawerOpen] = useState<boolean>(false);
     const [comments, setComments] = useState<Comment[]>([]);
     const [isRedirectLoginModalOpen, setRedirectLoginModalOpen] = useState(false);
+    const [localLikeCount, setLocalLikeCount] = useState(initialLikeCount);
+    const [localHasLiked, setLocalHasLiked] = useState(initialHasLiked);
 
-    const user = useAuth();
 
     // Toggle the drawer open or close
     const toggleDrawer = (newOpen: boolean, resolutionId: string) => async () => {
@@ -83,12 +85,39 @@ const ResolutionCard: React.FC<CartProps> = ({ ideaTitle, ideaDescription, likeC
     const handleLikeResolution = async () => {
         if (!user) {
             setRedirectLoginModalOpen(true);
+            return;
         }
-        await likeResolution(r_id);
+        try {
+            await likeResolution(r_id);
+            setLocalHasLiked(!localHasLiked);
+            setLocalLikeCount(prevCount => localHasLiked ? prevCount - 1 : prevCount + 1);
+        } catch (error) {
+            console.error("Error liking resolution:", error);
+            // Revert local state if the API call fails
+            setLocalHasLiked(localHasLiked);
+            setLocalLikeCount(localLikeCount);
+        }
     };
 
+    const LikeButton = ({ className = '' }) => (
+        <Box
+            display="flex"
+            alignItems="center"
+            onClick={handleLikeResolution}
+            sx={{ cursor: 'pointer' }}
+            className={className}
+        >
+            {localHasLiked ? (
+                <FavoriteIcon sx={{ marginRight: 1, color: "#E03673" }} />
+            ) : (
+                <FavoriteBorderIcon sx={{ marginRight: 1, color: "#fff" }} />
+            )}
+            <Typography variant="body2" fontSize="18px">{localLikeCount}</Typography>
+        </Box>
+    );
+
     return (
-        <Card sx={{ display: 'flex', flexDirection: 'column', backgroundColor: '#242936', color: '#f5f5f5', position: 'relative', height: "250px", p: 2, maxWidth: '400px', justifyContent: 'space-between' }}>
+        <Card sx={{ display: 'flex', flexDirection: 'column', backgroundColor: '#242936', color: '#f5f5f5', position: 'relative', height: "250px", p: 2, maxWidth: '400px', justifyContent: 'space-between', }}>
 
             <Box sx={{
                 display: 'flex',
@@ -116,8 +145,10 @@ const ResolutionCard: React.FC<CartProps> = ({ ideaTitle, ideaDescription, likeC
                         display: "-webkit-box", // Use flex container for ellipsis in multiple lines
                         WebkitLineClamp: 5,
                         my: 2,
-                        color: "#f2f2f2"
+                        color: "#f2f2f2",
+                        cursor: 'pointer'
                     }}
+                    onClick={toggleDrawer(true, r_id)}
                 >{ideaDescription}</Typography>
             </Box>
 
@@ -125,11 +156,7 @@ const ResolutionCard: React.FC<CartProps> = ({ ideaTitle, ideaDescription, likeC
                 display: 'flex',
                 gap: '20px',
                 flexDirection: 'column',
-
             }}>
-
-
-                {/* Tags */}
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
                     {tags.map((tag, index) => {
                         // Find the corresponding tag data in the availableTags array
@@ -172,15 +199,8 @@ const ResolutionCard: React.FC<CartProps> = ({ ideaTitle, ideaDescription, likeC
                     }}>
                         {/* Likes and Comments */}
                         <Box display="flex" alignItems="center" justifyContent="space-between" gap="10px">
-                            <Box display="flex" alignItems="center" onClick={handleLikeResolution}>
-                                {hasLiked ? (
-                                    <FavoriteIcon sx={{ marginRight: 1, color: "#E03673" }} />
-                                ) : (
-                                    <FavoriteBorderIcon sx={{ marginRight: 1, color: "#fff" }} />
-                                )}
-                                <Typography variant="body2" fontSize="18px">{likeCount}</Typography>
-                            </Box>
-                            <Box display="flex" alignItems="center" onClick={toggleDrawer(true, r_id)}>
+                            <LikeButton />
+                            <Box display="flex" alignItems="center" onClick={toggleDrawer(true, r_id)} sx={{ cursor: 'pointer' }}>
                                 <CommentIcon sx={{ marginRight: 1, color: "#2196F3" }} />
                                 <Typography variant="body2" fontSize="18px">{commentCount}</Typography>
                             </Box>
@@ -200,19 +220,20 @@ const ResolutionCard: React.FC<CartProps> = ({ ideaTitle, ideaDescription, likeC
                     setIsCommentDrawerOpen={setIsCommentDrawerOpen}
                     name={ideaTitle}
                     resolution={ideaDescription}
-                    likeCount={likeCount}
+                    likeCount={localLikeCount}
                     commentCount={commentCount}
                     createdAt={createdAt}
                     tags={tags}
                     r_id={r_id}
                     comments={comments}
-                    hasLiked={hasLiked}
+                    hasLiked={localHasLiked}
+                    LikeButton={LikeButton}
                 />
             }
             <RedirectToLoginModal
                 open={isRedirectLoginModalOpen}
                 onClose={() => setRedirectLoginModalOpen(false)}
-                heading="Please login to add resolutions!"
+                heading="Please login to like resolutions!"
             />
         </Card >
     );

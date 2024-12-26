@@ -8,6 +8,15 @@ const theme = createTheme({
     mode: 'dark',
   },
   components: {
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          '& .MuiInputBase-input': {
+            fontFamily: 'Comic Neue, sans-serif',
+          }
+        }
+      }
+    },
     MuiMenuItem: {
       styleOverrides: {
         root: {

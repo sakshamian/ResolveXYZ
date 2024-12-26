@@ -20,7 +20,7 @@ interface Resolution {
     tags: string[];
     user_name: string;
     user_id: string;
-    hasLiked:boolean;
+    hasLiked: boolean;
 }
 
 const Main = () => {
@@ -98,7 +98,7 @@ const Main = () => {
                         </Box>
                     }
                     endMessage={
-                        <Typography sx={{ my: 4 }} variant="body1" align="center" color="textSecondary">
+                        <Typography sx={{ mt: 8 }} variant="body1" align="center" color="textSecondary">
                             &#128104; That's all folks! You've reached the end.
                         </Typography>
                     }
