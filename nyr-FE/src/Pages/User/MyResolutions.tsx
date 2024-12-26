@@ -36,25 +36,25 @@ const MyResolutions = () => {
 
     return (
         <div style={{
-            margin: '40px 20px'
+            margin: '50px 10vw'
         }}>
             <div className="card-container">
                 <Box
-                    display="flex"
-                    flexWrap="wrap"
-                    gap={2}
-                    p={2}
-                    justifyContent="space-between"
-                >
-                    {cards?.map((card, ind) => {
-                        return (
+                        display="grid"
+                        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+                        gap={2}
+                        justifyContent={cards.length === 1 ? "center" : "start"}
+                        justifyItems={cards.length === 1 ? "center" : "stretch"}
+                    >
+                        {cards?.map((card, index) => (
                             <Box
-                                key={ind}
-                                flex="1 1 calc(33.333% - 16px)"
+                                key={card._id}
+                                gridColumn={cards.length === 2 && index === 1 ? "span 1" : "auto"}
+                                flex="1"
                                 minWidth="300px"
                             >
                                 <ResolutionCard
-                                    ideaTitle={user?.name || "Unknown user"}
+                                    ideaTitle={card.user_name || "Unknown User"}
                                     ideaDescription={card.resolution || "No resolution provided"}
                                     likeCount={card.like_count}
                                     commentCount={card.comment_count}
@@ -65,9 +65,8 @@ const MyResolutions = () => {
                                     hasLiked={card.isLiked}
                                 />
                             </Box>
-                        );
-                    })}
-                </Box>
+                        ))}
+                    </Box>
             </div>
         </div >
     )

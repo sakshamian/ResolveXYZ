@@ -117,7 +117,7 @@ const ResolutionCard: React.FC<CartProps> = ({ ideaTitle, ideaDescription, likeC
     );
 
     return (
-        <Card sx={{ display: 'flex', flexDirection: 'column', backgroundColor: '#242936', color: '#f5f5f5', position: 'relative', height: "250px", p: 2, maxWidth: '400px', justifyContent: 'space-between', }}>
+        <Card sx={{ display: 'flex', flexDirection: 'column', backgroundColor: '#242936', color: '#f5f5f5', position: 'relative', height: "280px", p: 2, justifyContent: 'space-between' }}>
 
             <Box sx={{
                 display: 'flex',
