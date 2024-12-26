@@ -126,7 +126,7 @@ const ResolutionModal: React.FC<ResolutionModalProps> = ({ open, onClose, onSubm
                         </Box>
                     )}
                 >
-                    {['Productivity', 'Family', 'Health', 'Education', 'Fitness', 'Finance', 'Career', 'Happiness', 'Mindfulness'].map((tag) => (
+                    {['Productivity', 'Family', 'Health', 'Education', 'Fitness', 'Finance', 'Career', 'Happiness', 'Mindfulness', 'Travel'].map((tag) => (
                         <MenuItem key={tag} value={tag}>
                             {tag}
                         </MenuItem>
