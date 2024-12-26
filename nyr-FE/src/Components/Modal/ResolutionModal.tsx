@@ -41,8 +41,12 @@ const ResolutionModal: React.FC<ResolutionModalProps> = ({ open, onClose, onSubm
     };
 
     // Handle tag removal (via the cross icon)
-    const handleRemoveTag = (tag: string) => {
-        setSelectedTags(selectedTags.filter((t) => t !== tag));
+    const handleRemoveTag = (tagToDelete: string) => (event: React.MouseEvent) => {
+        console.log(tagToDelete, "here")
+        event.preventDefault();
+        event.stopPropagation();
+        setSelectedTags((tags) => tags.filter((tag) => tag !== tagToDelete));
+        setTagLimitReached(false);
     };
 
     // Handle form submission
@@ -65,7 +69,8 @@ const ResolutionModal: React.FC<ResolutionModalProps> = ({ open, onClose, onSubm
                     boxShadow: 24,
                     p: 4,
                     borderRadius: 2,
-                    width: 400,
+                    width: '90%',
+                    maxWidth: 400,
                 }}
             >
                 <Box sx={{ fontSize: "18px", fontWeight: 400, mb: 2, display: "flex", justifyContent: "space-between" }}>
@@ -99,11 +104,17 @@ const ResolutionModal: React.FC<ResolutionModalProps> = ({ open, onClose, onSubm
                                     <Chip
                                         key={tag}
                                         label={tag}
-                                        onDelete={() => handleRemoveTag(tag)}
+                                        onDelete={handleRemoveTag(tag)}
+                                        onMouseDown={(event) => {
+                                            event.stopPropagation();
+                                        }}
                                         sx={{
                                             backgroundColor: ' #242936',
                                             color: '#fff',  // Dark text color for contrast
                                             borderRadius: '16px',
+                                            borderWidth: 1,
+                                            borderStyle: 'solid',
+                                            borderColor: '#ccc', // Default border if not found
                                             padding: '5px ',
                                             '&:hover': {
                                                 borderColor: '#8C8C8C',  // Slightly darker on hover
@@ -141,6 +152,7 @@ const ResolutionModal: React.FC<ResolutionModalProps> = ({ open, onClose, onSubm
                             py: 0.5,
                         }}
                         onClick={handleSubmit}
+                        disabled={description.trim() === ''}
                     >
                         Post
                     </Button>

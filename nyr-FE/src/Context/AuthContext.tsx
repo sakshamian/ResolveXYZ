@@ -5,6 +5,7 @@ interface User {
     email: string;
     name: string;
     profile: string;
+    id: string;
 }
 
 interface AuthContextType {
@@ -31,6 +32,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                     email: data.email,
                     name: data.name,
                     profile: data.image,
+                    id: data.id,
                 });
             } catch {
                 handleSignOut();

@@ -131,8 +131,13 @@ func GetResolutionByID(c *gin.Context) {
 				},
 				"comments": bson.M{
 					"$map": bson.M{
-						"input": "$comments",
-						"as":    "comment",
+						"input": bson.M{
+							"$sortArray": bson.M{
+								"input":  "$comments",              // The comments array
+								"sortBy": bson.M{"created_at": -1}, // Sort by created_at descending
+							},
+						},
+						"as": "comment",
 						"in": bson.M{
 							"$mergeObjects": []interface{}{
 								"$$comment", // Retain the original comment fields

@@ -24,7 +24,8 @@ const LogoutModal: React.FC<LogoutModalProps> = ({ open, onClose, onLogout }) =>
                     boxShadow: 50,
                     p: 3,
                     borderRadius: 2,
-                    width: 400,
+                    width: '90%',
+                    maxWidth: 400,
                 }}
             >
                 <Box sx={{

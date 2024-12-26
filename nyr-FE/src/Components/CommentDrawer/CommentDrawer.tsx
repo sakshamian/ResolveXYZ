@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import CloseIcon from "@mui/icons-material/Close";
 import { CardContent, CardActions, Typography, IconButton, Box, Card, Drawer, List, Divider, ListItem, ListItemAvatar, ListItemText, Avatar, Button, TextField, Chip } from '@mui/material';
@@ -7,6 +7,8 @@ import CommentIcon from '@mui/icons-material/Comment';
 import { addComment, likeResolution } from '../../services/api';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import { convertTimeToDaysAgo } from '../../utils/utils';
+import RedirectToLoginModal from '../Modal/RedirectToLoginModal';
+import { useAuth } from '../../Context/AuthContext';
 
 const availableTags = [
     { tag: 'Productivity', c: 'rgb(134 239 172/var(--tw-text-opacity,1))', bgc: 'rgba(5,46,22,.4)', bc: 'rgba(5,46,22,.4)' },
@@ -48,8 +50,8 @@ interface CommentDrawerProps {
     tags: string[];
     r_id: string;
     comments: Comment[];
-    user_id: string;
     hasLiked: boolean;
+    LikeButton: React.FC<{ className?: string }>;
 }
 
 const CommentDrawer: React.FC<CommentDrawerProps> = ({
@@ -57,46 +59,67 @@ const CommentDrawer: React.FC<CommentDrawerProps> = ({
     setIsCommentDrawerOpen,
     name,
     resolution,
-    likeCount,
-    commentCount,
+    likeCount: initialLikeCount,
+    commentCount: initialCommentCount,
     createdAt,
     tags,
     r_id,
-    comments,
-    user_id,
-    hasLiked,
+    comments: initialComments,
+    hasLiked: initialHasLiked,
+    LikeButton
 }) => {
 
     const [newComment, setNewComment] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string>('');
+    const [isRedirectLoginModalOpen, setRedirectLoginModalOpen] = useState(false);
+    const [localComments, setLocalComments] = useState<Comment[]>(initialComments);
+    const [localCommentCount, setLocalCommentCount] = useState(initialCommentCount);
+    const [localLikeCount, setLocalLikeCount] = useState(initialLikeCount);
+    const [localHasLiked, setLocalHasLiked] = useState(initialHasLiked);
+
+    const { user } = useAuth();
 
     const handleAddComment = async () => {
         if (!newComment.trim()) {
             return; // Do nothing if the comment is empty
         }
-
-        setLoading(true);
+        if (!user) {
+            setRedirectLoginModalOpen(true);
+            return;
+        }
+        // setLoading(true);
         setError('');
         try {
-            const response = await addComment(r_id, user_id, newComment);
+            const response = await addComment(r_id, newComment);
+            const newCommentObj: Comment = {
+                _id: response._id || Date.now().toString(),
+                comment: newComment,
+                created_at: new Date().toISOString(),
+                r_id,
+                updated_at: new Date().toISOString(),
+                user_detail: {
+                    name: user.name || name,
+                    user_id: user.id
+                }
+            };
+
+            setLocalComments(prev => [newCommentObj, ...prev]);
+            setLocalCommentCount(prev => prev + 1);
             setNewComment('');
         } catch (err) {
             setError('Failed to add comment. Please try again later.');
         } finally {
-            setLoading(false);
+            // setLoading(false);
         }
     };
 
-    const handleLikeResolution = async () => {
-        setLoading(true);
-        await likeResolution(r_id);
-    };
-
-    const getTagColor = (tagName: string): string | undefined => {
-        const tag = availableTags.find(t => t.tag === tagName);
-        return tag ? tag.color : undefined;
-    };
+    useEffect(() => {
+        setLocalComments(initialComments);
+        setLocalCommentCount(initialCommentCount);
+        setLocalLikeCount(initialLikeCount);
+        setLocalHasLiked(initialHasLiked);
+    }, [initialComments, initialCommentCount, initialHasLiked, initialLikeCount]);
 
     return (
         <Drawer
@@ -106,7 +129,7 @@ const CommentDrawer: React.FC<CommentDrawerProps> = ({
             sx={{
                 "& .MuiDrawer-paper": {
                     width: { xs: "100vw", sm: "60vw", md: "50vw" }, // Responsive width based on screen size
-                    maxWidth: "90vw", 
+                    maxWidth: "90vw",
                     '@media (max-width: 900px)': {
                         width: '100%',  // Full width for screens <= 900px
                     },
@@ -144,7 +167,7 @@ const CommentDrawer: React.FC<CommentDrawerProps> = ({
                 </Avatar>
 
                 <Box sx={{ display: "flex", flexDirection: "column", flex: 1 }}>
-                    <Box sx={{display:"flex", alignItems:"center", justifyContent:"space-between"}}>
+                    <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                         <Typography variant="body1" fontWeight="bold" color="#FFFFFF" fontSize="16px">
                             {name}
                         </Typography>
@@ -164,49 +187,50 @@ const CommentDrawer: React.FC<CommentDrawerProps> = ({
             </Box>
 
             {/* Tags */}
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '10px' , p: 2 }}  >
-                                {tags.map((tag, index) => {
-                                    // Find the corresponding tag data in the availableTags array
-                                    const tagData = availableTags.find(item => item.tag === tag);
-            
-                                    return (
-                                        <Chip
-                                            key={index}
-                                            label={tag}
-                                            sx={{
-                                                height: '30px',
-                                                borderWidth: 1,
-                                                borderStyle: 'solid',
-                                                backgroundColor: tagData?.bgc || 'rgba(0, 0, 0, 0.1)', // Default background if not found
-                                                borderColor: tagData?.bc || '#ccc', // Default border if not found
-                                                color: tagData?.c || '#fff', // Default text color if not found
-                                                fontSize: '14px',
-                                                fontWeight: '500',
-                                                cursor: 'pointer',
-                                                transition: 'all 0.3s ease',
-                                                '&:hover': {
-                                                    backgroundColor: tagData?.bc || '#ccc', // Change background on hover
-                                                    color: 'white', // Optional hover effect
-                                                },
-                                            }}
-                                        />
-                                    );
-                                })}
-                            </Box>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '10px', p: 2 }}  >
+                {tags.map((tag, index) => {
+                    // Find the corresponding tag data in the availableTags array
+                    const tagData = availableTags.find(item => item.tag === tag);
+
+                    return (
+                        <Chip
+                            key={index}
+                            label={tag}
+                            sx={{
+                                height: '30px',
+                                borderWidth: 1,
+                                borderStyle: 'solid',
+                                backgroundColor: tagData?.bgc || 'rgba(0, 0, 0, 0.1)', // Default background if not found
+                                borderColor: tagData?.bc || '#ccc', // Default border if not found
+                                color: tagData?.c || '#fff', // Default text color if not found
+                                fontSize: '14px',
+                                fontWeight: '500',
+                                cursor: 'pointer',
+                                transition: 'all 0.3s ease',
+                                '&:hover': {
+                                    backgroundColor: tagData?.bc || '#ccc', // Change background on hover
+                                    color: 'white', // Optional hover effect
+                                },
+                            }}
+                        />
+                    );
+                })}
+            </Box>
 
             {/* Likes and Comments */}
-            <Box display="flex" alignItems="center" justifyContent="" gap={2} p={2}>
-                <Box display="flex" alignItems="center" onClick={handleLikeResolution}>
-                    {hasLiked ? (
+            <Box display="flex" alignItems="center" gap={2} p={2}>
+                {/* <Box display="flex" alignItems="center" onClick={handleLikeResolution} sx={{ cursor: 'pointer' }}>
+                    {localHasLiked ? (
                         <FavoriteIcon sx={{ marginRight: 1, color: "#E03673" }} />
                     ) : (
                         <FavoriteBorderIcon sx={{ marginRight: 1, color: "#fff" }} />
                     )}
-                    <Typography variant="body2" fontSize="18px">{likeCount}</Typography>
-                </Box>
-                <Box display="flex" alignItems="center">
+                    <Typography variant="body2" fontSize="18px">{localLikeCount}</Typography>
+                </Box> */}
+                <LikeButton />
+                <Box display="flex" alignItems="center" sx={{ cursor: 'pointer' }}>
                     <CommentIcon sx={{ marginRight: 1, color: "#2196F3" }} />
-                    <Typography variant="body2" fontSize="18px">{commentCount}</Typography>
+                    <Typography variant="body2" fontSize="18px">{localCommentCount}</Typography>
                 </Box>
             </Box>
 
@@ -223,9 +247,7 @@ const CommentDrawer: React.FC<CommentDrawerProps> = ({
                         backgroundColor: "#3A3F47",
                         borderRadius: 1,
                         color: "#FFFFFF",
-                    }}
-                    InputProps={{
-                        sx: { color: "#FFFFFF" },
+                        '& .MuiInputBase-root': { paddingTop: '0px' }
                     }}
                 />
                 <Button
@@ -233,7 +255,7 @@ const CommentDrawer: React.FC<CommentDrawerProps> = ({
                     fullWidth
                     sx={{ marginTop: 1, backgroundColor: "#2196F3", color: "#fff", fontWeight: 600 }}
                     onClick={handleAddComment}
-                    disabled={loading}
+                    disabled={loading || !newComment.trim()}
                 >
                     {loading ? "Posting..." : "Post Comment"}
                 </Button>
@@ -242,8 +264,8 @@ const CommentDrawer: React.FC<CommentDrawerProps> = ({
             <Divider sx={{ borderColor: "#3A3F47" }} />
 
             {/* Comments Section */}
-            <List>
-                {comments.map((comment) => (
+            <List sx={{ mb: 3 }}>
+                {localComments.map((comment) => (
                     <ListItem key={comment._id} alignItems="flex-start">
                         <ListItemAvatar>
                             <Avatar
@@ -292,6 +314,12 @@ const CommentDrawer: React.FC<CommentDrawerProps> = ({
                     </ListItem>
                 ))}
             </List>
+
+            <RedirectToLoginModal
+                open={isRedirectLoginModalOpen}
+                onClose={() => setRedirectLoginModalOpen(false)}
+                heading="Please login to share your thoughts!"
+            />
 
         </Drawer>
     );

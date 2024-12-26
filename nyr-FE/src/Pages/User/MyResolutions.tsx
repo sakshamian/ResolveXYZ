@@ -2,6 +2,7 @@ import { Box } from '@mui/material';
 import ResolutionCard from '../../Components/Card/ResolutionCard';
 import { useEffect, useState } from 'react';
 import { fetchMyResolutions } from '../../services/api';
+import { useAuth } from '../../Context/AuthContext';
 
 interface Resolution {
     _id: string;
@@ -13,10 +14,12 @@ interface Resolution {
     tags: string[];
     user_name: string;
     user_id: string;
+    isLiked: boolean;
 }
 
 const MyResolutions = () => {
     const [cards, setCards] = useState<Resolution[]>([]);
+    const { user } = useAuth();
 
     const loadCards = async () => {
         try {
@@ -51,7 +54,7 @@ const MyResolutions = () => {
                                 minWidth="300px"
                             >
                                 <ResolutionCard
-                                    ideaTitle={card.user_name || "Unknown User"}
+                                    ideaTitle={user?.name || "Unknown user"}
                                     ideaDescription={card.resolution || "No resolution provided"}
                                     likeCount={card.like_count}
                                     commentCount={card.comment_count}
@@ -59,6 +62,7 @@ const MyResolutions = () => {
                                     tags={card.tags}
                                     r_id={card._id}
                                     user_id={card.user_id}
+                                    hasLiked={card.isLiked}
                                 />
                             </Box>
                         );
