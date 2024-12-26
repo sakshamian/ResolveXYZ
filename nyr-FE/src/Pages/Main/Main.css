@@ -1,5 +1,5 @@
 .main-container{
-  margin: 50px;
+  margin: 50px 10vw;
 }
 
 .card-container {
@@ -8,8 +8,6 @@
   flex-wrap: wrap;
   justify-content: center;
   gap: 20px;
-  /* margin: 50px auto;
-  max-width: 1200px; */
   box-sizing: border-box;
   align-items: center;
 }
@@ -22,4 +20,27 @@
 .card p {
   font-size: 1rem;
   line-height: 1.5;
+}
+/* Default grid for small screens (1 column) */
+.grid-cols-1 {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  justify-items: center; /* Center single items horizontally */
+  gap: 16px; /* Space between items */
+}
+
+/* Medium screens: 2 columns */
+@media (min-width: 800px) {
+  .md\:grid-cols-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      justify-items: start; /* Align items to start */
+  }
+}
+
+/* Large screens: 3 columns */
+@media (min-width: 1150px) {
+  .lg\:grid-cols-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      justify-items: space-between; /* Equally space items in three columns */
+  }
 }

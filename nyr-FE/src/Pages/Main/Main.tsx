@@ -20,7 +20,7 @@ interface Resolution {
     tags: string[];
     user_name: string;
     user_id: string;
-    hasLiked:boolean;
+    hasLiked: boolean;
 }
 
 const Main = () => {
@@ -106,7 +106,7 @@ const Main = () => {
                         padding: '0px'
                     }}
                 >
-                    <Box
+                    {/* <Box
                         display="flex"
                         flexWrap="wrap"
                         gap={2}
@@ -118,6 +118,8 @@ const Main = () => {
                                     key={card._id}
                                     flex="1 1 calc(33.333% - 16px)" // This ensures three cards per row with space between them
                                     minWidth="300px" // Minimum width to avoid items being too small
+                                   
+                                    
                                 >
                                     <ResolutionCard
                                         ideaTitle={card.user_name || "Unknown User"}
@@ -133,7 +135,37 @@ const Main = () => {
                                 </Box>
                             );
                         })}
+                    </Box> */}
+
+                    <Box
+                        display="grid"
+                        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+                        gap={2}
+                        justifyContent={cards.length === 1 ? "center" : "start"}
+                        justifyItems={cards.length === 1 ? "center" : "stretch"}
+                    >
+                        {cards?.map((card, index) => (
+                            <Box
+                                key={card._id}
+                                gridColumn={cards.length === 2 && index === 1 ? "span 1" : "auto"}
+                                flex="1"
+                                minWidth="300px"
+                            >
+                                <ResolutionCard
+                                    ideaTitle={card.user_name || "Unknown User"}
+                                    ideaDescription={card.resolution || "No resolution provided"}
+                                    likeCount={card.like_count}
+                                    commentCount={card.comment_count}
+                                    createdAt={card.created_at}
+                                    tags={card.tags}
+                                    r_id={card._id}
+                                    user_id={card.user_id}
+                                    hasLiked={card.hasLiked}
+                                />
+                            </Box>
+                        ))}
                     </Box>
+
                 </InfiniteScroll>
             </div>
             <ResolutionModal
