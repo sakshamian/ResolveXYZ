@@ -40,33 +40,32 @@ const MyResolutions = () => {
         }}>
             <div className="card-container">
                 <Box
-                        display="grid"
-                        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
-                        gap={2}
-                        justifyContent={cards.length === 1 ? "center" : "start"}
-                        justifyItems={cards.length === 1 ? "center" : "stretch"}
-                    >
-                        {cards?.map((card, index) => (
-                            <Box
-                                key={card._id}
-                                gridColumn={cards.length === 2 && index === 1 ? "span 1" : "auto"}
-                                flex="1"
-                                minWidth="300px"
-                            >
-                                <ResolutionCard
-                                    ideaTitle={card.user_name || "Unknown User"}
-                                    ideaDescription={card.resolution || "No resolution provided"}
-                                    likeCount={card.like_count}
-                                    commentCount={card.comment_count}
-                                    createdAt={card.created_at}
-                                    tags={card.tags}
-                                    r_id={card._id}
-                                    user_id={card.user_id}
-                                    hasLiked={card.isLiked}
-                                />
-                            </Box>
-                        ))}
-                    </Box>
+                    display="grid"
+                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+                    gap={2}
+                    justifyContent={cards.length === 1 ? "center" : "start"}
+                    justifyItems={cards.length === 1 ? "center" : "stretch"}
+                >
+                    {cards?.map((card, index) => (
+                        <Box
+                            key={card._id}
+                            gridColumn={cards.length === 2 && index === 1 ? "span 1" : "auto"}
+                            flex="1"
+                            minWidth="300px"
+                        >
+                            <ResolutionCard
+                                ideaTitle={user?.name || "Unknown User"}
+                                ideaDescription={card.resolution || "No resolution provided"}
+                                likeCount={card.like_count}
+                                commentCount={card.comment_count}
+                                createdAt={card.created_at}
+                                tags={card.tags}
+                                r_id={card._id}
+                                hasLiked={card.isLiked}
+                            />
+                        </Box>
+                    ))}
+                </Box>
             </div>
         </div >
     )

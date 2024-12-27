@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Menu from '@mui/material/Menu';
@@ -14,7 +14,6 @@ import EventNoteIcon from '@mui/icons-material/EventNote';
 import Person2Icon from '@mui/icons-material/Person2';
 import LogoutIcon from '@mui/icons-material/Logout';
 import LockOpenIcon from '@mui/icons-material/LockOpen';
-import icon from '../../assets/logo.svg';
 
 function ResponsiveAppBar() {
   const navigate = useNavigate();

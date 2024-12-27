@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { Box, Button, Typography } from "@mui/material";
 import { fetchResolutions, postResolutions } from "../../services/api";
@@ -41,9 +41,9 @@ const Main = () => {
     };
     const handleClose = () => setIsModalOpen(false);
 
-    const handleSubmitResolution = (resolution: { resolution: string; tags: string[] }) => {
-        postResolutions(resolution);
-        window.location.reload();
+    const handleSubmitResolution = async (resolution: { resolution: string; tags: string[] }) => {
+        await postResolutions(resolution);
+        // window.location.reload();
     };
     const loadCards = async () => {
         try {
@@ -128,7 +128,6 @@ const Main = () => {
                                     createdAt={card.created_at}
                                     tags={card.tags}
                                     r_id={card._id}
-                                    user_id={card.user_id}
                                     hasLiked={card.hasLiked}
                                 />
                             </Box>

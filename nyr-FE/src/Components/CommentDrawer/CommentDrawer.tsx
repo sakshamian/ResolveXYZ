@@ -1,11 +1,8 @@
 import React, { useEffect, useState } from 'react'
-import FavoriteIcon from "@mui/icons-material/Favorite";
 import CloseIcon from "@mui/icons-material/Close";
-import { CardContent, CardActions, Typography, IconButton, Box, Card, Drawer, List, Divider, ListItem, ListItemAvatar, ListItemText, Avatar, Button, TextField, Chip } from '@mui/material';
-import ThumbUpIcon from '@mui/icons-material/ThumbUp';
+import { Typography, IconButton, Box, Drawer, List, Divider, ListItem, ListItemAvatar, ListItemText, Avatar, Button, TextField, Chip } from '@mui/material';
 import CommentIcon from '@mui/icons-material/Comment';
-import { addComment, likeResolution } from '../../services/api';
-import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import { addComment } from '../../services/api';
 import { convertTimeToDaysAgo } from '../../utils/utils';
 import RedirectToLoginModal from '../Modal/RedirectToLoginModal';
 import { useAuth } from '../../Context/AuthContext';
@@ -70,13 +67,9 @@ const CommentDrawer: React.FC<CommentDrawerProps> = ({
 }) => {
 
     const [newComment, setNewComment] = useState("");
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string>('');
     const [isRedirectLoginModalOpen, setRedirectLoginModalOpen] = useState(false);
     const [localComments, setLocalComments] = useState<Comment[]>(initialComments);
     const [localCommentCount, setLocalCommentCount] = useState(initialCommentCount);
-    const [localLikeCount, setLocalLikeCount] = useState(initialLikeCount);
-    const [localHasLiked, setLocalHasLiked] = useState(initialHasLiked);
 
     const { user } = useAuth();
 
@@ -88,8 +81,6 @@ const CommentDrawer: React.FC<CommentDrawerProps> = ({
             setRedirectLoginModalOpen(true);
             return;
         }
-        // setLoading(true);
-        setError('');
         try {
             const response = await addComment(r_id, newComment);
             const newCommentObj: Comment = {
@@ -108,17 +99,15 @@ const CommentDrawer: React.FC<CommentDrawerProps> = ({
             setLocalCommentCount(prev => prev + 1);
             setNewComment('');
         } catch (err) {
-            setError('Failed to add comment. Please try again later.');
-        } finally {
-            // setLoading(false);
+            console.log(err);
         }
     };
 
     useEffect(() => {
         setLocalComments(initialComments);
         setLocalCommentCount(initialCommentCount);
-        setLocalLikeCount(initialLikeCount);
-        setLocalHasLiked(initialHasLiked);
+        // setLocalLikeCount(initialLikeCount);
+        // setLocalHasLiked(initialHasLiked);
     }, [initialComments, initialCommentCount, initialHasLiked, initialLikeCount]);
 
     return (
@@ -255,9 +244,9 @@ const CommentDrawer: React.FC<CommentDrawerProps> = ({
                     fullWidth
                     sx={{ marginTop: 1, backgroundColor: "#2196F3", color: "#fff", fontWeight: 600 }}
                     onClick={handleAddComment}
-                    disabled={loading || !newComment.trim()}
+                    disabled={!newComment.trim()}
                 >
-                    {loading ? "Posting..." : "Post Comment"}
+                    {"Post Comment"}
                 </Button>
             </Box>
 

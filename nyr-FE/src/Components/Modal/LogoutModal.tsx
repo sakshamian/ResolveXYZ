@@ -61,12 +61,6 @@ const LogoutModal: React.FC<LogoutModalProps> = ({ open, onClose, onLogout }) =>
                     >
                         Logout
                     </Button>
-                    {/* <Button variant="outlined" color="primary" onClick={onClose}>
-                        Cancel
-                    </Button>
-                    <Button variant="contained" color="error" onClick={onLogout}>
-                        Log Out
-                    </Button> */}
                 </Box>
             </Box>
         </Modal >

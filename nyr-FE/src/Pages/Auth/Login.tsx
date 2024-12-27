@@ -8,7 +8,7 @@ import UpdateProfileModal from '../../Components/Modal/UpdateProfileModal';
 const SignIn: React.FC = () => {
     const [updateProfileModalOpen, setUpdateProfileModalOpen] = useState(false);
     const [defaultUserName, setDefaultUsername] = useState('')
-    const { setToken, setUser } = useAuth();
+    const { setToken } = useAuth();
     const navigate = useNavigate();
 
     const handleLoginSuccess = async (response: any) => {

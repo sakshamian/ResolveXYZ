@@ -50,11 +50,12 @@ const ResolutionModal: React.FC<ResolutionModalProps> = ({ open, onClose, onSubm
     };
 
     // Handle form submission
-    const handleSubmit = () => {
-        onSubmit({ resolution: description, tags: selectedTags });
+    const handleSubmit = async () => {
+        console.log("asssda");
+        await onSubmit({ resolution: description, tags: selectedTags });
         setDescription('');
         setSelectedTags([]);
-        onClose();
+        // onClose();
     };
 
     return (

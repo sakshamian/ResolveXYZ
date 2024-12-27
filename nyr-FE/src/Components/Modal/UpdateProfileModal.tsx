@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { Modal, Box, Button, TextField } from '@mui/material';
-import { useAuth } from '../../Context/AuthContext';
 import { updateProfile } from '../../services/api';
 
 interface UpdateProfileModalProps {

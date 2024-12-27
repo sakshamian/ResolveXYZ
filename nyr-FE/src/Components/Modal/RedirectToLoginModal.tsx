@@ -1,7 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { Modal, Box, Button, TextField } from '@mui/material';
-import { useAuth } from '../../Context/AuthContext';
-import { updateProfile } from '../../services/api';
+import React from 'react';
+import { Modal, Box, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
 interface RedirectToLoginModalProps {

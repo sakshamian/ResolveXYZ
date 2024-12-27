@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { Typography, IconButton, Box, Card, Avatar, Chip } from '@mui/material';
-import ThumbUpIcon from '@mui/icons-material/ThumbUp';
+import { Typography, Box, Card, Avatar, Chip } from '@mui/material';
 import CommentIcon from '@mui/icons-material/Comment';
 import { fetchResolutionById, likeResolution } from '../../services/api';
 import { convertTimeToDaysAgo } from '../../utils/utils';
@@ -39,11 +38,10 @@ interface CartProps {
     createdAt: string;
     tags: string[];
     r_id: string;
-    user_id: string;
     hasLiked: boolean;
 }
 
-const ResolutionCard: React.FC<CartProps> = ({ ideaTitle, ideaDescription, likeCount: initialLikeCount, commentCount, createdAt, tags, r_id, user_id, hasLiked: initialHasLiked }) => {
+const ResolutionCard: React.FC<CartProps> = ({ ideaTitle, ideaDescription, likeCount: initialLikeCount, commentCount, createdAt, tags, r_id, hasLiked: initialHasLiked }) => {
 
     interface UserDetail {
         name: string;
