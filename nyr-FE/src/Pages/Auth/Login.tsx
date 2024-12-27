@@ -67,7 +67,7 @@ const SignIn: React.FC = () => {
                     </p>
                     <GoogleLogin
                         onSuccess={handleLoginSuccess}
-                        onError={handleLoginFailure}
+                        onError={() => handleLoginFailure}
                         text="continue_with"
                     // useOneTap
                     />
