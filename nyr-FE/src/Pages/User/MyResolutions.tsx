@@ -1,4 +1,4 @@
-import { Box, Divider, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import ResolutionCard from '../../Components/Card/ResolutionCard';
 import { useEffect, useState } from 'react';
 import { fetchMyResolutions } from '../../services/api';
