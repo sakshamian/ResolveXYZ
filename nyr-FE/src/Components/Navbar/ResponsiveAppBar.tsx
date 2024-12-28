@@ -94,7 +94,7 @@ function ResponsiveAppBar() {
                     <Divider />
                     <MenuItem sx={{ fontSize: 14 }} onClick={() => {
                       setAnchorEl(null);
-                      navigate('/my-posts');
+                      navigate('/my-resolutions');
                     }}>
                       <EventNoteIcon fontSize='small' sx={{ paddingRight: '5px' }} />
                       My resolutions

@@ -1,4 +1,4 @@
-import { Box } from '@mui/material';
+import { Box, Divider, Typography } from '@mui/material';
 import ResolutionCard from '../../Components/Card/ResolutionCard';
 import { useEffect, useState } from 'react';
 import { fetchMyResolutions } from '../../services/api';
@@ -38,6 +38,9 @@ const MyResolutions = () => {
         <div style={{
             margin: '50px 10vw'
         }}>
+            <Typography variant='h4' sx={{ color: "#fff" }}>
+                My resolutions
+            </Typography>
             <div className="card-container">
                 <Box
                     display="grid"

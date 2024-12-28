@@ -21,6 +21,10 @@ const availableTags = [
         tag: 'Technology',
         c: 'rgb(147 197 253/var(--tw-text-opacity,1))', bgc: 'rgba(23,37,84,.4)', bc: 'rgb(30 64 175/var(--tw-border-opacity,1))'
     },
+    {
+        tag: 'Travel',
+        bc: 'rgb(36, 137, 190)', c: 'rgb(64, 188, 255)', bgc: 'rgb(6, 51, 76)'
+    },
 ];
 
 interface UserDetail {

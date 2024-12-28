@@ -21,7 +21,7 @@ function App() {
             }
           />
           <Route
-            path="/my-posts"
+            path="/my-resolutions"
             element={
               <ProtectedRoute>
                 <ResponsiveAppBar />
