@@ -42,7 +42,6 @@ const ResolutionModal: React.FC<ResolutionModalProps> = ({ open, onClose, onSubm
 
     // Handle tag removal (via the cross icon)
     const handleRemoveTag = (tagToDelete: string) => (event: React.MouseEvent) => {
-        console.log(tagToDelete, "here")
         event.preventDefault();
         event.stopPropagation();
         setSelectedTags((tags) => tags.filter((tag) => tag !== tagToDelete));
@@ -51,11 +50,10 @@ const ResolutionModal: React.FC<ResolutionModalProps> = ({ open, onClose, onSubm
 
     // Handle form submission
     const handleSubmit = async () => {
-        console.log("asssda");
         await onSubmit({ resolution: description, tags: selectedTags });
         setDescription('');
         setSelectedTags([]);
-        // onClose();
+        onClose();
     };
 
     return (

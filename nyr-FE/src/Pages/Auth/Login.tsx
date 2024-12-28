@@ -69,7 +69,9 @@ const SignIn: React.FC = () => {
                         onSuccess={handleLoginSuccess}
                         onError={() => handleLoginFailure}
                         text="continue_with"
-                    // useOneTap
+                        containerProps={{
+                            style: { width: "100%" }, // Ensure full width
+                        }}
                     />
                 </div>
             </div>

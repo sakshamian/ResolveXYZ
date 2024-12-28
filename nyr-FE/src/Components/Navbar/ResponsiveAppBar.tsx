@@ -39,6 +39,7 @@ function ResponsiveAppBar() {
     setLogoutModalOpen(false);
     signOut();
     navigate('/');
+    window.location.reload();
   };
 
   // Check if user is logged in

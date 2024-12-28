@@ -63,24 +63,19 @@ const ResolutionCard: React.FC<CartProps> = ({ ideaTitle, ideaDescription, likeC
     const [isRedirectLoginModalOpen, setRedirectLoginModalOpen] = useState(false);
     const [localLikeCount, setLocalLikeCount] = useState(initialLikeCount);
     const [localHasLiked, setLocalHasLiked] = useState(initialHasLiked);
-
+    const [isLoading, setIsLoading] = useState(false);
 
     // Toggle the drawer open or close
     const toggleDrawer = (newOpen: boolean, resolutionId: string) => async () => {
         setIsCommentDrawerOpen(newOpen); // Open or close the drawer
 
-        if (!newOpen) return; // If we're closing the drawer, do nothing
+        if (!newOpen) return;
 
         try {
-            console.log("Fetching data for resolution ID:", resolutionId);
-            const fetchedData = await fetchResolutionById(resolutionId); // Fetch the resolution data by ID
-            console.log(fetchedData);
-            // console.log(fetchedData.resolution.comments);
-            console.log(comments);
-            // Assuming the fetched data contains a "comments" field
-            setComments(fetchedData.data.comments);// Set comments from fetched data
+            const fetchedData = await fetchResolutionById(resolutionId);
+            setComments(fetchedData.data.comments);
         } catch (error) {
-            console.error("Error fetching resolution data:", error); // Log error if API fails
+            console.error("Error fetching resolution data:", error);
         }
     };
 
@@ -89,15 +84,20 @@ const ResolutionCard: React.FC<CartProps> = ({ ideaTitle, ideaDescription, likeC
             setRedirectLoginModalOpen(true);
             return;
         }
+
+        if (isLoading) return;
+        setIsLoading(true);
+
         try {
             await likeResolution(r_id);
             setLocalHasLiked(!localHasLiked);
             setLocalLikeCount(prevCount => localHasLiked ? prevCount - 1 : prevCount + 1);
         } catch (error) {
             console.error("Error liking resolution:", error);
-            // Revert local state if the API call fails
             setLocalHasLiked(localHasLiked);
             setLocalLikeCount(localLikeCount);
+        } finally {
+            setIsLoading(false);
         }
     };
 

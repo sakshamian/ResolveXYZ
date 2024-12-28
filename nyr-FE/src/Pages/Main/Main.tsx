@@ -43,7 +43,7 @@ const Main = () => {
 
     const handleSubmitResolution = async (resolution: { resolution: string; tags: string[] }) => {
         await postResolutions(resolution);
-        // window.location.reload();
+        window.location.reload();
     };
     const loadCards = async () => {
         try {

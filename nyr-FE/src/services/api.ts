@@ -90,7 +90,6 @@ export const addComment = async (r_id: string, comment: string) => {
         r_id,
         comment: comment
     };
-    console.log(commentData)
     try {
         const response = await fetch(`${API_BASE_URL}/resolution/comments`, {
             method: 'POST',
