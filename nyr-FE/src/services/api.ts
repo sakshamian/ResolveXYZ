@@ -27,10 +27,10 @@ export const verifyToken = async (token: string): Promise<any> => {
 };
 
 
-export const fetchResolutions = async (page: number, limit: number = 10) => {
+export const fetchResolutions = async (page: number, limit: number = 10, sort: string = "likes") => {
     const token = localStorage.getItem("token");
     try {
-        const response = await fetch(`${API_BASE_URL}/resolution?page=${page}&limit=${limit}`,
+        const response = await fetch(`${API_BASE_URL}/resolution?page=${page}&limit=${limit}&sort=${sort}`,
             {
                 headers: {
                     Authorization: `Bearer ${token}`,

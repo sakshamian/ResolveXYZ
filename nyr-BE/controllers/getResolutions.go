@@ -44,6 +44,17 @@ func GetResolutions(c *gin.Context) {
 		limit = 6 // default to 6 items per page
 	}
 
+	sortFactor := c.DefaultQuery("sort", "likes")
+
+	sortField := bson.M{} // Initialize an empty sort field map
+
+	// Dynamically determine the sort field based on the sortFactor
+	if sortFactor == "created_at" {
+		sortField["created_at"] = -1 // Sort by "created_at" in descending order
+	} else {
+		sortField["like_count"] = -1 // Default to sorting by "like_count" in descending order
+	}
+
 	// Calculate skip for pagination
 	skip := (page - 1) * limit
 
@@ -89,9 +100,7 @@ func GetResolutions(c *gin.Context) {
 			},
 		},
 		{
-			"$sort": bson.M{
-				"like_count": -1,
-			},
+			"$sort": sortField,
 		},
 		{
 			"$skip": skip,
