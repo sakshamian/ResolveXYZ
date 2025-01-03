@@ -33,6 +33,8 @@ const Main = () => {
     const [page, setPage] = useState(1);
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const [selectedSort, setSelectedSort] = useState<string>("Trending");
+    const [currentSort, setCurrentSort] = useState<string>("likes");
+
     const open = Boolean(anchorEl);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -58,16 +60,19 @@ const Main = () => {
         await postResolutions(resolution);
         window.location.reload();
     };
-    const loadCards = async (sort: string = "likes", reset: boolean = false) => {
+    const loadCards = async (sort?: string, reset: boolean = false) => {
         try {
+            const sortParam = sort || currentSort;
+
             if (reset) {
                 setCards([]);
                 setPage(1);
                 setHasMore(true);
+                setCurrentSort(sortParam);
             }
 
             const currentPage = reset ? 1 : page;
-            const data = await fetchResolutions(currentPage, 10, sort);
+            const data = await fetchResolutions(currentPage, 10, sortParam);
 
             if (!data || data.resolutions.length === 0) {
                 setHasMore(false);
